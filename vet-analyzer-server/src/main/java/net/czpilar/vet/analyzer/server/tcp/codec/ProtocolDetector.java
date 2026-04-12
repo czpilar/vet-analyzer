@@ -4,11 +4,13 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import net.czpilar.vet.analyzer.core.parser.MessageParserRegistry;
+import net.czpilar.vet.analyzer.core.protocol.ControlCharacters;
 import net.czpilar.vet.analyzer.core.protocol.hl7.Hl7Protocol;
 import net.czpilar.vet.analyzer.server.session.Session;
 import net.czpilar.vet.analyzer.server.session.SessionManager;
 import net.czpilar.vet.analyzer.server.tcp.handler.FujifilmChannelHandler;
 import net.czpilar.vet.analyzer.server.tcp.handler.Hl7ChannelHandler;
+import net.czpilar.vet.analyzer.server.tcp.handler.RawChannelHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,13 +53,30 @@ public class ProtocolDetector extends ByteToMessageDecoder {
             pipeline.addLast("mllpDecoder", new MllpDecoder());
             pipeline.addLast("mllpEncoder", new MllpEncoder());
             pipeline.addLast("handler", new Hl7ChannelHandler(session, parserRegistry));
-        } else {
+        } else if (isFujifilm(peek)) {
             log.info("Detected Fujifilm protocol from {}", remoteAddress);
             pipeline.addLast("stxEtxDecoder", new StxEtxDecoder());
             pipeline.addLast("handler", new FujifilmChannelHandler(session, parserRegistry));
+        } else {
+            log.warn("Unknown protocol from {}, logging raw data", remoteAddress);
+            pipeline.addLast("rawDecoder", new RawDecoder());
+            pipeline.addLast("handler", new RawChannelHandler(session));
         }
 
         // Remove this detector and replay the buffered data
         pipeline.remove(this);
+    }
+
+    private static boolean isFujifilm(byte[] peek) {
+        if (peek[0] == ControlCharacters.STX) {
+            return true;
+        }
+        // Unframed Fujifilm - starts with known command letter followed by comma
+        if (peek.length >= 2 && peek[1] == ',') {
+            char cmd = (char) peek[0];
+            return cmd == 'R' || cmd == 'I' || cmd == 'W' || cmd == 'S' || cmd == 'E'
+                    || cmd == 'T' || cmd == 'X' || cmd == 'Y';
+        }
+        return false;
     }
 }
