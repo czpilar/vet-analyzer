@@ -29,27 +29,61 @@ Requires Java 25.
 
 Produces ZIP distribution in `vet-analyzer-app/target/vet-analyzer-app-<version>.zip`.
 
-## Usage
+## Running from Command Line
 
 ### Server
+
+Via Maven wrapper:
+
+```
+./mvnw -pl :vet-analyzer-server spring-boot:run
+```
+
+Or via JAR:
+
+```
+java -jar vet-analyzer-server/target/vet-analyzer-server-<version>.jar
+```
+
+Or from ZIP distribution:
 
 ```
 bin/vet-analyzer-server.bat
 bin/vet-analyzer-server.sh
 ```
 
-Or run via Maven:
+### Test Client
+
+Via Maven wrapper:
 
 ```
-./mvnw -pl vet-analyzer-server spring-boot:run
+./mvnw -pl :vet-analyzer-test-client spring-boot:run
 ```
+
+Or via JAR:
+
+```
+java -jar vet-analyzer-test-client/target/vet-analyzer-test-client-<version>.jar
+```
+
+Or from ZIP distribution:
+
+```
+bin/vet-analyzer-test-client.bat
+bin/vet-analyzer-test-client.sh
+```
+
+## Server
 
 Server listens on a single TCP port (default 9012) and auto-detects the analyzer type from the first incoming message:
+
 - **BM850/EXIGO** - detected by MLLP framing (0x0B) or `MSH|` prefix
 - **NX600** - detected by STX framing + command `R`, `I`, `W`, `S`, `E`
 - **AU20V** - detected by STX framing + command `T`, `X`, `Y`
+- **Unknown** - any other protocol is logged as raw data
 
-Each TCP connection creates a session log file in the `sessions/` directory containing raw messages with parsed annotations.
+Each TCP connection creates a session log file in the `sessions/` directory containing raw messages with parsed
+annotations.
 
 ### Configuration
 
@@ -63,47 +97,57 @@ vet:
       session-directory: ./sessions
 ```
 
-### Test Client
+## Test Client Commands
 
-```
-bin/vet-analyzer-test-client.bat
-bin/vet-analyzer-test-client.sh
-```
+Interactive shell with prompt `vet:analyzer>`.
 
-Or run via Maven:
+### BM850/EXIGO H400 (HL7)
 
-```
-./mvnw -pl vet-analyzer-test-client spring-boot:run
-```
+| Command            | Description                                       |
+|--------------------|---------------------------------------------------|
+| `hl7 connect`      | Connect to server                                 |
+| `hl7 send results` | Send hematology results (RBC, WBC, HGB, PLT, ...) |
+| `hl7 all`          | Connect, send all message types, disconnect       |
+| `hl7 disconnect`   | Disconnect                                        |
 
-Available commands (prompt: `vet:analyzer>`):
+### Fujifilm NX600 (Biochemistry)
 
-**BM850/EXIGO H400 (HL7):**
-- `hl7 connect` - connect to server
-- `hl7 send results` - send hematology results (RBC, WBC, HGB, PLT, ...)
-- `hl7 all` - connect, send all message types, disconnect
-- `hl7 disconnect`
+| Command                  | Description                                             |
+|--------------------------|---------------------------------------------------------|
+| `nx600 connect`          | Connect to server                                       |
+| `nx600 send results`     | Send biochemistry results (TP, ALP, GLU, GPT, CRE, ...) |
+| `nx600 send start`       | Send test start notification                            |
+| `nx600 send worklist`    | Send worklist query                                     |
+| `nx600 send sample info` | Send sample info query                                  |
+| `nx600 send error`       | Send error notification                                 |
+| `nx600 full sequence`    | Run full S -> R sequence                                |
+| `nx600 all`              | Connect, send all message types, disconnect             |
+| `nx600 disconnect`       | Disconnect                                              |
 
-**Fujifilm NX600 (Biochemistry):**
-- `nx600 connect` - connect to server
-- `nx600 send results` - send biochemistry results (TP, ALP, GLU, GPT, CRE, BUN, ...)
-- `nx600 send start` - send test start notification
-- `nx600 send worklist` - send worklist query
-- `nx600 send sample info` - send sample info query
-- `nx600 send error` - send error notification
-- `nx600 full sequence` - run full S -> R sequence
-- `nx600 all` - connect, send all message types, disconnect
-- `nx600 disconnect`
+### Fujifilm AU20V (Immunoassay)
 
-**Fujifilm AU20V (Immunoassay):**
-- `au20v connect` - connect to server
-- `au20v send results` - send immunoassay results (v-PRG, v-TSH, v-T4, ...)
-- `au20v send order query` - send order query
-- `au20v send order query ref range` - send order query with reference interval range
-- `au20v send error` - send error notification
-- `au20v full sequence` - run full S -> T sequence
-- `au20v all` - connect, send all message types, disconnect
-- `au20v disconnect`
+| Command                            | Description                                        |
+|------------------------------------|----------------------------------------------------|
+| `au20v connect`                    | Connect to server                                  |
+| `au20v send results`               | Send immunoassay results (v-PRG, v-TSH, v-T4, ...) |
+| `au20v send order query`           | Send order query                                   |
+| `au20v send order query ref range` | Send order query with reference interval range     |
+| `au20v send error`                 | Send error notification                            |
+| `au20v full sequence`              | Run full S -> T sequence                           |
+| `au20v all`                        | Connect, send all message types, disconnect        |
+| `au20v disconnect`                 | Disconnect                                         |
+
+### Raw / Unknown Device
+
+| Command           | Description                                        |
+|-------------------|----------------------------------------------------|
+| `raw connect`     | Connect as unknown device (no protocol framing)    |
+| `raw send`        | Send arbitrary text message                        |
+| `raw send binary` | Send binary data as hex string                     |
+| `raw all`         | Connect, send various unknown messages, disconnect |
+| `raw disconnect`  | Disconnect                                         |
+
+All connect commands accept optional `--host` (default `localhost`) and `--port` (default `9012`) parameters.
 
 ## Session Log Format
 
@@ -126,11 +170,14 @@ Tests: TP-PS=74 g/l [55-75], ALP-PS=4.51 ukat/l [0.10-4.00] H, ...
 === SESSION END === 2025-09-15 10:30:05
 ```
 
+For unknown devices, messages are logged as `UNKNOWN` type without parsed section.
+
 ## Using Core Library in Other Projects
 
 Add Maven dependency:
 
 ```xml
+
 <dependency>
     <groupId>net.czpilar.vet.analyzer</groupId>
     <artifactId>vet-analyzer-core</artifactId>
