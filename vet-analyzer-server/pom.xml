@@ -63,20 +63,6 @@
         </resources>
         <plugins>
             <plugin>
-                <groupId>org.codehaus.gmavenplus</groupId>
-                <artifactId>gmavenplus-plugin</artifactId>
-                <configuration>
-                    <targetBytecode>${java.target}</targetBytecode>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>compileTests</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <executions>
