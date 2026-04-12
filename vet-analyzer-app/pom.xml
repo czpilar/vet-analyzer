@@ -18,12 +18,10 @@
         <dependency>
             <groupId>net.czpilar.vet.analyzer</groupId>
             <artifactId>vet-analyzer-server</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>net.czpilar.vet.analyzer</groupId>
             <artifactId>vet-analyzer-test-client</artifactId>
-            <version>${project.version}</version>
         </dependency>
     </dependencies>
 

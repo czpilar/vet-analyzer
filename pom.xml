@@ -84,6 +84,16 @@
                 <artifactId>vet-analyzer-spring-boot-starter</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>net.czpilar.vet.analyzer</groupId>
+                <artifactId>vet-analyzer-server</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.czpilar.vet.analyzer</groupId>
+                <artifactId>vet-analyzer-test-client</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- HAPI HL7 -->
             <dependency>
@@ -138,10 +148,23 @@
                 <scope>test</scope>
             </dependency>
 
+            <!-- Spring Shell -->
+            <dependency>
+                <groupId>org.springframework.shell</groupId>
+                <artifactId>spring-shell-starter-jansi</artifactId>
+                <version>${version.spring-shell}</version>
+            </dependency>
+
             <!-- Spock / Groovy -->
             <dependency>
                 <groupId>org.spockframework</groupId>
                 <artifactId>spock-core</artifactId>
+                <version>${version.spock}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.spockframework</groupId>
+                <artifactId>spock-spring</artifactId>
                 <version>${version.spock}</version>
                 <scope>test</scope>
             </dependency>
