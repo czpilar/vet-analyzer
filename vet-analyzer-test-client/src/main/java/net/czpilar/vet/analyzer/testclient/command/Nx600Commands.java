@@ -70,7 +70,7 @@ public class Nx600Commands {
 
     @Command(name = "nx600 send worklist", description = "Send worklist query")
     public String nx600SendWorklistQuery(
-            @Option(longName = "sampleNumber", defaultValue = "") String sampleNumber,
+            @Option(longName = "sampleNumber", defaultValue = "1") String sampleNumber,
             @Option(longName = "count", defaultValue = "3") Integer count) {
         if (simulator == null || !simulator.isConnected()) {
             return "Not connected. Use 'nx600 connect' first.";
