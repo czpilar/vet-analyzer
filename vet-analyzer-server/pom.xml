@@ -15,22 +15,11 @@
     <description>Spring Boot TCP server for veterinary analyzers</description>
 
     <dependencies>
-        <!-- Project -->
+        <!-- Vet Analyzer Starter (includes core + netty + spring-boot-starter) -->
         <dependency>
             <groupId>net.czpilar.vet.analyzer</groupId>
-            <artifactId>vet-analyzer-core</artifactId>
-        </dependency>
-
-        <!-- Spring Boot -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
-        </dependency>
-
-        <!-- Netty -->
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-all</artifactId>
+            <artifactId>vet-analyzer-spring-boot-starter</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- Test -->

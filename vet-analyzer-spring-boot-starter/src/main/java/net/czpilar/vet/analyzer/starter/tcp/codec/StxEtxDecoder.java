@@ -1,4 +1,4 @@
-package net.czpilar.vet.analyzer.server.tcp.codec;
+package net.czpilar.vet.analyzer.starter.tcp.codec;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;

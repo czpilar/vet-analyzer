@@ -2,7 +2,6 @@ package net.czpilar.vet.analyzer.server.session;
 
 import net.czpilar.vet.analyzer.core.model.AnalyzerMessage;
 import net.czpilar.vet.analyzer.core.model.AnalyzerType;
-import net.czpilar.vet.analyzer.core.model.MeasurementResult;
 import net.czpilar.vet.analyzer.core.model.fujifilm.FujifilmResultMessage;
 import net.czpilar.vet.analyzer.core.model.hl7.Hl7Message;
 import org.slf4j.Logger;
@@ -16,8 +15,6 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.UUID;
-
 public class Session {
 
     private static final Logger log = LoggerFactory.getLogger(Session.class);
@@ -31,8 +28,8 @@ public class Session {
     private final BufferedWriter writer;
     private AnalyzerType detectedType;
 
-    public Session(String remoteAddress, Path sessionDirectory) throws IOException {
-        this.sessionId = UUID.randomUUID().toString().substring(0, 8);
+    public Session(String sessionId, String remoteAddress, Path sessionDirectory) throws IOException {
+        this.sessionId = sessionId;
         this.remoteAddress = remoteAddress;
         this.startedAt = Instant.now();
 
@@ -126,6 +123,10 @@ public class Session {
 
     public AnalyzerType getDetectedType() {
         return detectedType;
+    }
+
+    public String getRemoteAddress() {
+        return remoteAddress;
     }
 
     public Path getSessionFile() {

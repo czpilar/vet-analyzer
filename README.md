@@ -12,12 +12,13 @@ Communication server for veterinary laboratory analyzers.
 
 ## Project Structure
 
-| Module                     | Description                                                                                                |
-|----------------------------|------------------------------------------------------------------------------------------------------------|
-| `vet-analyzer-core`        | Core library - protocol handling, message models, parsers. No Spring dependency, usable as standalone JAR. |
-| `vet-analyzer-server`      | Spring Boot TCP server with Netty. Auto-detects analyzer type from incoming data. Logs sessions to files.  |
-| `vet-analyzer-test-client` | Spring Shell interactive client simulating all 3 analyzer types.                                           |
-| `vet-analyzer-app`         | Distribution package - produces ZIP with scripts, JARs, and configuration.                                 |
+| Module                              | Description                                                                                                |
+|-------------------------------------|------------------------------------------------------------------------------------------------------------|
+| `vet-analyzer-core`                 | Core library - protocol handling, message models, parsers, listener API. No Spring dependency.              |
+| `vet-analyzer-spring-boot-starter`  | Spring Boot Starter - auto-configures TCP server with Netty. Embeddable into any Spring Boot app.          |
+| `vet-analyzer-server`               | Standalone Spring Boot server - uses starter + file-based session logging.                                  |
+| `vet-analyzer-test-client`          | Spring Shell interactive client simulating all 3 analyzer types + raw/unknown device.                      |
+| `vet-analyzer-app`                  | Distribution package - produces ZIP with scripts, JARs, and configuration.                                 |
 
 ## Build
 
@@ -36,7 +37,7 @@ Produces ZIP distribution in `vet-analyzer-app/target/vet-analyzer-app-<version>
 Via Maven wrapper:
 
 ```
-./mvnw -pl :vet-analyzer-server spring-boot:run
+./mvnw -pl vet-analyzer-server spring-boot:run
 ```
 
 Or via JAR:
@@ -57,7 +58,7 @@ bin/vet-analyzer-server.sh
 Via Maven wrapper:
 
 ```
-./mvnw -pl :vet-analyzer-test-client spring-boot:run
+./mvnw -pl vet-analyzer-test-client spring-boot:run
 ```
 
 Or via JAR:
@@ -76,14 +77,12 @@ bin/vet-analyzer-test-client.sh
 ## Server
 
 Server listens on a single TCP port (default 9012) and auto-detects the analyzer type from the first incoming message:
-
 - **BM850/EXIGO** - detected by MLLP framing (0x0B) or `MSH|` prefix
 - **NX600** - detected by STX framing + command `R`, `I`, `W`, `S`, `E`
 - **AU20V** - detected by STX framing + command `T`, `X`, `Y`
 - **Unknown** - any other protocol is logged as raw data
 
-Each TCP connection creates a session log file in the `sessions/` directory containing raw messages with parsed
-annotations.
+Each TCP connection creates a session log file in the `sessions/` directory containing raw messages with parsed annotations.
 
 ### Configuration
 
@@ -93,6 +92,7 @@ Edit `config/application.yml`:
 vet:
   analyzer:
     server:
+      enabled: true
       port: 9012
       session-directory: ./sessions
 ```
@@ -103,49 +103,49 @@ Interactive shell with prompt `vet:analyzer>`.
 
 ### BM850/EXIGO H400 (HL7)
 
-| Command            | Description                                       |
-|--------------------|---------------------------------------------------|
-| `hl7 connect`      | Connect to server                                 |
+| Command            | Description                                      |
+|--------------------|--------------------------------------------------|
+| `hl7 connect`      | Connect to server                                |
 | `hl7 send results` | Send hematology results (RBC, WBC, HGB, PLT, ...) |
-| `hl7 all`          | Connect, send all message types, disconnect       |
-| `hl7 disconnect`   | Disconnect                                        |
+| `hl7 all`          | Connect, send all message types, disconnect      |
+| `hl7 disconnect`   | Disconnect                                       |
 
 ### Fujifilm NX600 (Biochemistry)
 
-| Command                  | Description                                             |
-|--------------------------|---------------------------------------------------------|
-| `nx600 connect`          | Connect to server                                       |
-| `nx600 send results`     | Send biochemistry results (TP, ALP, GLU, GPT, CRE, ...) |
-| `nx600 send start`       | Send test start notification                            |
-| `nx600 send worklist`    | Send worklist query                                     |
-| `nx600 send sample info` | Send sample info query                                  |
-| `nx600 send error`       | Send error notification                                 |
-| `nx600 full sequence`    | Run full S -> R sequence                                |
-| `nx600 all`              | Connect, send all message types, disconnect             |
-| `nx600 disconnect`       | Disconnect                                              |
+| Command                 | Description                                            |
+|-------------------------|--------------------------------------------------------|
+| `nx600 connect`         | Connect to server                                      |
+| `nx600 send results`    | Send biochemistry results (TP, ALP, GLU, GPT, CRE, ...) |
+| `nx600 send start`      | Send test start notification                           |
+| `nx600 send worklist`   | Send worklist query                                    |
+| `nx600 send sample info`| Send sample info query                                 |
+| `nx600 send error`      | Send error notification                                |
+| `nx600 full sequence`   | Run full S -> R sequence                               |
+| `nx600 all`             | Connect, send all message types, disconnect            |
+| `nx600 disconnect`      | Disconnect                                             |
 
 ### Fujifilm AU20V (Immunoassay)
 
-| Command                            | Description                                        |
-|------------------------------------|----------------------------------------------------|
-| `au20v connect`                    | Connect to server                                  |
-| `au20v send results`               | Send immunoassay results (v-PRG, v-TSH, v-T4, ...) |
-| `au20v send order query`           | Send order query                                   |
-| `au20v send order query ref range` | Send order query with reference interval range     |
-| `au20v send error`                 | Send error notification                            |
-| `au20v full sequence`              | Run full S -> T sequence                           |
-| `au20v all`                        | Connect, send all message types, disconnect        |
-| `au20v disconnect`                 | Disconnect                                         |
+| Command                             | Description                                           |
+|-------------------------------------|-------------------------------------------------------|
+| `au20v connect`                     | Connect to server                                     |
+| `au20v send results`                | Send immunoassay results (v-PRG, v-TSH, v-T4, ...)    |
+| `au20v send order query`            | Send order query                                      |
+| `au20v send order query ref range`  | Send order query with reference interval range        |
+| `au20v send error`                  | Send error notification                               |
+| `au20v full sequence`               | Run full S -> T sequence                              |
+| `au20v all`                         | Connect, send all message types, disconnect           |
+| `au20v disconnect`                  | Disconnect                                            |
 
 ### Raw / Unknown Device
 
-| Command           | Description                                        |
-|-------------------|----------------------------------------------------|
-| `raw connect`     | Connect as unknown device (no protocol framing)    |
-| `raw send`        | Send arbitrary text message                        |
-| `raw send binary` | Send binary data as hex string                     |
-| `raw all`         | Connect, send various unknown messages, disconnect |
-| `raw disconnect`  | Disconnect                                         |
+| Command            | Description                                           |
+|--------------------|-------------------------------------------------------|
+| `raw connect`      | Connect as unknown device (no protocol framing)       |
+| `raw send`         | Send arbitrary text message                           |
+| `raw send binary`  | Send binary data as hex string                        |
+| `raw all`          | Connect, send various unknown messages, disconnect    |
+| `raw disconnect`   | Disconnect                                            |
 
 All connect commands accept optional `--host` (default `localhost`) and `--port` (default `9012`) parameters.
 
@@ -172,16 +172,78 @@ Tests: TP-PS=74 g/l [55-75], ALP-PS=4.51 ukat/l [0.10-4.00] H, ...
 
 For unknown devices, messages are logged as `UNKNOWN` type without parsed section.
 
-## Using Core Library in Other Projects
+## Embedding in Existing Spring Boot Application
 
-Add Maven dependency:
+The `vet-analyzer-spring-boot-starter` module allows embedding the TCP analyzer server into any existing Spring Boot application (e.g. alongside Tomcat).
+
+### 1. Add dependency
 
 ```xml
+<dependency>
+    <groupId>net.czpilar.vet.analyzer</groupId>
+    <artifactId>vet-analyzer-spring-boot-starter</artifactId>
+    <version>...</version>
+</dependency>
+```
 
+### 2. Implement listener
+
+```java
+@Component
+public class AnalyzerResultService implements AnalyzerMessageListener {
+
+    @Override
+    public void onMessage(AnalyzerMessage message, String rawData, String remoteAddress) {
+        if (message instanceof FujifilmResultMessage result) {
+            for (var test : result.testResults()) {
+                // save to database, process, etc.
+            }
+        }
+        if (message instanceof Hl7Message hl7) {
+            for (var obs : hl7.observations()) {
+                // save hematology results
+            }
+        }
+    }
+
+    @Override
+    public void onSessionStart(String sessionId, String remoteAddress) {
+        // optional: log new connection
+    }
+
+    @Override
+    public void onSessionEnd(String sessionId) {
+        // optional: cleanup
+    }
+
+    @Override
+    public void onRawMessage(String rawData, String remoteAddress) {
+        // optional: handle unknown protocol data
+    }
+}
+```
+
+### 3. Configure
+
+```yaml
+vet:
+  analyzer:
+    server:
+      enabled: true
+      port: 9012
+```
+
+The TCP server starts automatically alongside your application (e.g. Tomcat on port 8080 + analyzer server on port 9012). Multiple `AnalyzerMessageListener` beans can be registered - all will be notified.
+
+## Using Core Library Standalone
+
+For projects that don't use Spring Boot, add the core library directly:
+
+```xml
 <dependency>
     <groupId>net.czpilar.vet.analyzer</groupId>
     <artifactId>vet-analyzer-core</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>...</version>
 </dependency>
 ```
 

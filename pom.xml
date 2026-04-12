@@ -22,6 +22,7 @@
 
     <modules>
         <module>vet-analyzer-core</module>
+        <module>vet-analyzer-spring-boot-starter</module>
         <module>vet-analyzer-server</module>
         <module>vet-analyzer-test-client</module>
         <module>vet-analyzer-app</module>
@@ -68,6 +69,11 @@
             <dependency>
                 <groupId>net.czpilar.vet.analyzer</groupId>
                 <artifactId>vet-analyzer-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.czpilar.vet.analyzer</groupId>
+                <artifactId>vet-analyzer-spring-boot-starter</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

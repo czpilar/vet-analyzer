@@ -1,12 +1,21 @@
-package net.czpilar.vet.analyzer.server.config;
+package net.czpilar.vet.analyzer.starter.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "vet.analyzer.server")
-public class ServerProperties {
+public class VetAnalyzerProperties {
 
+    private boolean enabled = true;
     private int port = 9012;
     private String sessionDirectory = "./sessions";
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
 
     public int getPort() {
         return port;
