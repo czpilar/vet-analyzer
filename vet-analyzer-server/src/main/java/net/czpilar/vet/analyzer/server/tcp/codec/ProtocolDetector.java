@@ -4,7 +4,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import net.czpilar.vet.analyzer.core.parser.MessageParserRegistry;
-import net.czpilar.vet.analyzer.core.protocol.ControlCharacters;
 import net.czpilar.vet.analyzer.core.protocol.hl7.Hl7Protocol;
 import net.czpilar.vet.analyzer.server.session.Session;
 import net.czpilar.vet.analyzer.server.session.SessionManager;
@@ -54,7 +53,6 @@ public class ProtocolDetector extends ByteToMessageDecoder {
             pipeline.addLast("handler", new Hl7ChannelHandler(session, parserRegistry));
         } else {
             log.info("Detected Fujifilm protocol from {}", remoteAddress);
-            boolean isFramed = peek[0] == ControlCharacters.STX;
             pipeline.addLast("stxEtxDecoder", new StxEtxDecoder());
             pipeline.addLast("handler", new FujifilmChannelHandler(session, parserRegistry));
         }
