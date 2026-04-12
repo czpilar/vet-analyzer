@@ -257,7 +257,10 @@ Parse messages:
 
 ```java
 import net.czpilar.vet.analyzer.core.model.AnalyzerMessage;
-import net.czpilar.vet.analyzer.core.model.fujifilm.*;
+import net.czpilar.vet.analyzer.core.model.fujifilm.FujifilmErrorMessage;
+import net.czpilar.vet.analyzer.core.model.fujifilm.FujifilmResultMessage;
+import net.czpilar.vet.analyzer.core.model.fujifilm.FujifilmStartMessage;
+import net.czpilar.vet.analyzer.core.model.fujifilm.FujifilmWorklistQueryMessage;
 import net.czpilar.vet.analyzer.core.model.hl7.Hl7Message;
 import net.czpilar.vet.analyzer.core.parser.MessageParserRegistry;
 
