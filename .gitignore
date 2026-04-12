@@ -5,3 +5,4 @@ target
 /.claude
 /*.iml
 /spring-shell.log
+/vet-analyzer-test-client/spring-shell.log

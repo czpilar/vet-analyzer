@@ -6,6 +6,7 @@ import org.springframework.shell.core.command.annotation.Command;
 import org.springframework.shell.core.command.annotation.Option;
 import org.springframework.stereotype.Component;
 
+@Component
 public class Au20vCommands {
 
     private FujifilmDeviceSimulator simulator;
@@ -14,7 +15,7 @@ public class Au20vCommands {
     @Command(name = "au20v connect", description = "Connect as Fujifilm AU20V analyzer")
     public String au20vConnect(
             @Option(longName = "host", defaultValue = "localhost") String host,
-            @Option(longName = "port", defaultValue = "9012") int port) {
+            @Option(longName = "port", defaultValue = "9012") Integer port) {
         try {
             simulator = new FujifilmDeviceSimulator(host, port);
             simulator.connect();
@@ -41,14 +42,42 @@ public class Au20vCommands {
 
     @Command(name = "au20v send order query", description = "Send order query")
     public String au20vSendOrderQuery(
-            @Option(longName = "sampleNumber", defaultValue = "") String sampleNumber,
-            @Option(longName = "count", defaultValue = "5") int count) {
+            @Option(longName = "sampleNumber", defaultValue = "1") String sampleNumber,
+            @Option(longName = "count", defaultValue = "5") Integer count) {
         if (simulator == null || !simulator.isConnected()) {
             return "Not connected. Use 'au20v connect' first.";
         }
         try {
             simulator.sendMessage(dataGenerator.generateOrderQuery(sampleNumber, count));
             return "Sent AU20V order query";
+        } catch (Exception e) {
+            return "Send failed: " + e.getMessage();
+        }
+    }
+
+    @Command(name = "au20v send order query ref range", description = "Send order query with reference interval range")
+    public String au20vSendOrderQueryRefRange(
+            @Option(longName = "sampleNumber", defaultValue = "1") String sampleNumber,
+            @Option(longName = "count", defaultValue = "5") Integer count) {
+        if (simulator == null || !simulator.isConnected()) {
+            return "Not connected. Use 'au20v connect' first.";
+        }
+        try {
+            simulator.sendMessage(dataGenerator.generateOrderQueryWithRefRange(sampleNumber, count));
+            return "Sent AU20V order query with ref range";
+        } catch (Exception e) {
+            return "Send failed: " + e.getMessage();
+        }
+    }
+
+    @Command(name = "au20v send error", description = "Send error notification")
+    public String au20vSendError() {
+        if (simulator == null || !simulator.isConnected()) {
+            return "Not connected. Use 'au20v connect' first.";
+        }
+        try {
+            simulator.sendMessage(dataGenerator.generateError());
+            return "Sent AU20V error";
         } catch (Exception e) {
             return "Send failed: " + e.getMessage();
         }

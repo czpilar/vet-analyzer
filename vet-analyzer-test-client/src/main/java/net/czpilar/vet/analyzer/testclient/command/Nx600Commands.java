@@ -15,7 +15,7 @@ public class Nx600Commands {
     @Command(name = "nx600 connect", description = "Connect as Fujifilm NX600 analyzer")
     public String nx600Connect(
             @Option(longName = "host", defaultValue = "localhost") String host,
-            @Option(longName = "port", defaultValue = "9012") int port) {
+            @Option(longName = "port", defaultValue = "9012") Integer port) {
         try {
             simulator = new FujifilmDeviceSimulator(host, port);
             simulator.connect();
@@ -54,10 +54,24 @@ public class Nx600Commands {
         }
     }
 
+    @Command(name = "nx600 send sample info", description = "Send sample info query")
+    public String nx600SendSampleInfo(
+            @Option(longName = "sampleNumber", defaultValue = "1") String sampleNumber) {
+        if (simulator == null || !simulator.isConnected()) {
+            return "Not connected. Use 'nx600 connect' first.";
+        }
+        try {
+            simulator.sendMessage(dataGenerator.generateSampleInfoQuery(sampleNumber));
+            return "Sent NX600 sample info query for sample " + sampleNumber;
+        } catch (Exception e) {
+            return "Send failed: " + e.getMessage();
+        }
+    }
+
     @Command(name = "nx600 send worklist", description = "Send worklist query")
     public String nx600SendWorklistQuery(
             @Option(longName = "sampleNumber", defaultValue = "") String sampleNumber,
-            @Option(longName = "count", defaultValue = "3") int count) {
+            @Option(longName = "count", defaultValue = "3") Integer count) {
         if (simulator == null || !simulator.isConnected()) {
             return "Not connected. Use 'nx600 connect' first.";
         }
@@ -82,6 +96,19 @@ public class Nx600Commands {
             return "Sent full NX600 sequence (S + R) for sample " + sampleNumber;
         } catch (Exception e) {
             return "Sequence failed: " + e.getMessage();
+        }
+    }
+
+    @Command(name = "nx600 send error", description = "Send error notification")
+    public String nx600SendError() {
+        if (simulator == null || !simulator.isConnected()) {
+            return "Not connected. Use 'nx600 connect' first.";
+        }
+        try {
+            simulator.sendMessage(dataGenerator.generateError());
+            return "Sent NX600 error";
+        } catch (Exception e) {
+            return "Send failed: " + e.getMessage();
         }
     }
 

@@ -15,7 +15,7 @@ public class Hl7Commands {
     @Command(name = "hl7 connect", description = "Connect as BM850/EXIGO H400 analyzer")
     public String hl7Connect(
             @Option(longName = "host", defaultValue = "localhost") String host,
-            @Option(longName = "port", defaultValue = "9012") int port) {
+            @Option(longName = "port", defaultValue = "9012") Integer port) {
         try {
             simulator = new Hl7DeviceSimulator(host, port);
             simulator.connect();
