@@ -12,13 +12,13 @@ Communication server for veterinary laboratory analyzers.
 
 ## Project Structure
 
-| Module                              | Description                                                                                                |
-|-------------------------------------|------------------------------------------------------------------------------------------------------------|
-| `vet-analyzer-core`                 | Core library - protocol handling, message models, parsers, listener API. No Spring dependency.              |
-| `vet-analyzer-spring-boot-starter`  | Spring Boot Starter - auto-configures TCP server with Netty. Embeddable into any Spring Boot app.          |
-| `vet-analyzer-server`               | Standalone Spring Boot server - uses starter + file-based session logging.                                  |
-| `vet-analyzer-test-client`          | Spring Shell interactive client simulating all 3 analyzer types + raw/unknown device.                      |
-| `vet-analyzer-app`                  | Distribution package - produces ZIP with scripts, JARs, and configuration.                                 |
+| Module                             | Description                                                                                       |
+|------------------------------------|---------------------------------------------------------------------------------------------------|
+| `vet-analyzer-core`                | Core library - protocol handling, message models, parsers, listener API. No Spring dependency.    |
+| `vet-analyzer-spring-boot-starter` | Spring Boot Starter - auto-configures TCP server with Netty. Embeddable into any Spring Boot app. |
+| `vet-analyzer-server`              | Standalone Spring Boot server - uses starter + file-based session logging.                        |
+| `vet-analyzer-test-client`         | Spring Shell interactive client simulating all 3 analyzer types + raw/unknown device.             |
+| `vet-analyzer-app`                 | Distribution package - produces ZIP with scripts, JARs, and configuration.                        |
 
 ## Build
 
@@ -32,15 +32,21 @@ Produces ZIP distribution in `vet-analyzer-app/target/vet-analyzer-app-<version>
 
 ## Running from Command Line
 
+First build the project:
+
+```
+./mvnw clean install -DskipTests
+```
+
 ### Server
 
-Via Maven wrapper:
+Via Maven wrapper (from project root):
 
 ```
-./mvnw -pl vet-analyzer-server spring-boot:run
+./mvnw -pl :vet-analyzer-server spring-boot:run
 ```
 
-Or via JAR:
+Or via JAR (after build):
 
 ```
 java -jar vet-analyzer-server/target/vet-analyzer-server-<version>.jar
@@ -55,13 +61,13 @@ bin/vet-analyzer-server.sh
 
 ### Test Client
 
-Via Maven wrapper:
+Via Maven wrapper (from project root):
 
 ```
-./mvnw -pl vet-analyzer-test-client spring-boot:run
+./mvnw -pl :vet-analyzer-test-client spring-boot:run
 ```
 
-Or via JAR:
+Or via JAR (after build):
 
 ```
 java -jar vet-analyzer-test-client/target/vet-analyzer-test-client-<version>.jar
@@ -103,49 +109,49 @@ Interactive shell with prompt `vet:analyzer>`.
 
 ### BM850/EXIGO H400 (HL7)
 
-| Command            | Description                                      |
-|--------------------|--------------------------------------------------|
-| `hl7 connect`      | Connect to server                                |
+| Command            | Description                                       |
+|--------------------|---------------------------------------------------|
+| `hl7 connect`      | Connect to server                                 |
 | `hl7 send results` | Send hematology results (RBC, WBC, HGB, PLT, ...) |
-| `hl7 all`          | Connect, send all message types, disconnect      |
-| `hl7 disconnect`   | Disconnect                                       |
+| `hl7 all`          | Connect, send all message types, disconnect       |
+| `hl7 disconnect`   | Disconnect                                        |
 
 ### Fujifilm NX600 (Biochemistry)
 
-| Command                 | Description                                            |
-|-------------------------|--------------------------------------------------------|
-| `nx600 connect`         | Connect to server                                      |
-| `nx600 send results`    | Send biochemistry results (TP, ALP, GLU, GPT, CRE, ...) |
-| `nx600 send start`      | Send test start notification                           |
-| `nx600 send worklist`   | Send worklist query                                    |
-| `nx600 send sample info`| Send sample info query                                 |
-| `nx600 send error`      | Send error notification                                |
-| `nx600 full sequence`   | Run full S -> R sequence                               |
-| `nx600 all`             | Connect, send all message types, disconnect            |
-| `nx600 disconnect`      | Disconnect                                             |
+| Command                  | Description                                             |
+|--------------------------|---------------------------------------------------------|
+| `nx600 connect`          | Connect to server                                       |
+| `nx600 send results`     | Send biochemistry results (TP, ALP, GLU, GPT, CRE, ...) |
+| `nx600 send start`       | Send test start notification                            |
+| `nx600 send worklist`    | Send worklist query                                     |
+| `nx600 send sample info` | Send sample info query                                  |
+| `nx600 send error`       | Send error notification                                 |
+| `nx600 full sequence`    | Run full S -> R sequence                                |
+| `nx600 all`              | Connect, send all message types, disconnect             |
+| `nx600 disconnect`       | Disconnect                                              |
 
 ### Fujifilm AU20V (Immunoassay)
 
-| Command                             | Description                                           |
-|-------------------------------------|-------------------------------------------------------|
-| `au20v connect`                     | Connect to server                                     |
-| `au20v send results`                | Send immunoassay results (v-PRG, v-TSH, v-T4, ...)    |
-| `au20v send order query`            | Send order query                                      |
-| `au20v send order query ref range`  | Send order query with reference interval range        |
-| `au20v send error`                  | Send error notification                               |
-| `au20v full sequence`               | Run full S -> T sequence                              |
-| `au20v all`                         | Connect, send all message types, disconnect           |
-| `au20v disconnect`                  | Disconnect                                            |
+| Command                            | Description                                        |
+|------------------------------------|----------------------------------------------------|
+| `au20v connect`                    | Connect to server                                  |
+| `au20v send results`               | Send immunoassay results (v-PRG, v-TSH, v-T4, ...) |
+| `au20v send order query`           | Send order query                                   |
+| `au20v send order query ref range` | Send order query with reference interval range     |
+| `au20v send error`                 | Send error notification                            |
+| `au20v full sequence`              | Run full S -> T sequence                           |
+| `au20v all`                        | Connect, send all message types, disconnect        |
+| `au20v disconnect`                 | Disconnect                                         |
 
 ### Raw / Unknown Device
 
-| Command            | Description                                           |
-|--------------------|-------------------------------------------------------|
-| `raw connect`      | Connect as unknown device (no protocol framing)       |
-| `raw send`         | Send arbitrary text message                           |
-| `raw send binary`  | Send binary data as hex string                        |
-| `raw all`          | Connect, send various unknown messages, disconnect    |
-| `raw disconnect`   | Disconnect                                            |
+| Command           | Description                                        |
+|-------------------|----------------------------------------------------|
+| `raw connect`     | Connect as unknown device (no protocol framing)    |
+| `raw send`        | Send arbitrary text message                        |
+| `raw send binary` | Send binary data as hex string                     |
+| `raw all`         | Connect, send various unknown messages, disconnect |
+| `raw disconnect`  | Disconnect                                         |
 
 All connect commands accept optional `--host` (default `localhost`) and `--port` (default `9012`) parameters.
 
@@ -250,12 +256,48 @@ For projects that don't use Spring Boot, add the core library directly:
 Parse messages:
 
 ```java
-var registry = MessageParserRegistry.createDefault();
-AnalyzerMessage message = registry.parse(rawData);
+import net.czpilar.vet.analyzer.core.model.AnalyzerMessage;
+import net.czpilar.vet.analyzer.core.model.fujifilm.*;
+import net.czpilar.vet.analyzer.core.model.hl7.Hl7Message;
+import net.czpilar.vet.analyzer.core.parser.MessageParserRegistry;
 
-if (message instanceof FujifilmResultMessage result) {
-    for (var test : result.testResults()) {
-        System.out.println(test.testCode() + " = " + test.value() + " " + test.unit());
+public class Example {
+
+    public static void main(String[] args) {
+        String rawData = args[0];
+        var registry = MessageParserRegistry.createDefault();
+        AnalyzerMessage message = registry.parse(rawData);
+
+        // BM850 / EXIGO H400 - HL7 hematology results
+        if (message instanceof Hl7Message hl7) {
+            System.out.println("HL7 " + hl7.messageType() + ", Sample: " + hl7.sampleId());
+            for (var obs : hl7.observations()) {
+                System.out.println(obs.observationId() + " = " + obs.value() + " " + obs.unit()
+                        + " [" + obs.referenceRange() + "]");
+            }
+        }
+
+        // Fujifilm NX600 / AU20V - biochemistry / immunoassay results
+        if (message instanceof FujifilmResultMessage result) {
+            System.out.println(result.analyzerType().displayName()
+                    + ", Sample: " + result.sampleNumber()
+                    + ", Patient: " + result.patientId());
+            for (var test : result.testResults()) {
+                System.out.println(test.testCode() + " " + test.relation() + " " + test.value()
+                        + " " + test.unit() + " [" + test.rangeLow() + "-" + test.rangeHigh() + "]");
+            }
+        }
+
+        // Fujifilm NX600 / AU20V - other message types
+        if (message instanceof FujifilmStartMessage start) {
+            System.out.println("Measurement started: " + start.sampleNumber());
+        }
+        if (message instanceof FujifilmErrorMessage error) {
+            System.out.println("Error: " + error.errorData());
+        }
+        if (message instanceof FujifilmWorklistQueryMessage query) {
+            System.out.println("Worklist query: " + query.sampleNumber());
+        }
     }
 }
 ```
