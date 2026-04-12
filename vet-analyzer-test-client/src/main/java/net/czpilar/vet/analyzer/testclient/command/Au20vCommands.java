@@ -2,6 +2,7 @@ package net.czpilar.vet.analyzer.testclient.command;
 
 import net.czpilar.vet.analyzer.testclient.data.Au20vSampleDataGenerator;
 import net.czpilar.vet.analyzer.testclient.simulator.fujifilm.FujifilmDeviceSimulator;
+import org.springframework.shell.core.command.CommandContext;
 import org.springframework.shell.core.command.annotation.Command;
 import org.springframework.shell.core.command.annotation.Option;
 import org.springframework.stereotype.Component;
@@ -91,7 +92,7 @@ public class Au20vCommands {
         }
         try {
             simulator.sendMessage(dataGenerator.generateStartMessage(sampleNumber));
-            Thread.sleep(500);
+            CommandUtils.delay(500);
             simulator.sendMessage(dataGenerator.generateResultMessage(sampleNumber));
             return "Sent full AU20V sequence (S + T) for sample " + sampleNumber;
         } catch (Exception e) {
@@ -101,23 +102,17 @@ public class Au20vCommands {
 
     @Command(name = "au20v all", description = "Connect, send all message types, disconnect")
     public String au20vAll(
+            CommandContext ctx,
             @Option(longName = "host", defaultValue = "localhost") String host,
             @Option(longName = "port", defaultValue = "9012") Integer port) {
-        var sb = new StringBuilder();
-        sb.append(au20vConnect(host, port)).append(CommandUtils.NL);
-        CommandUtils.delay();
-        sb.append(au20vSendOrderQuery("1", 5)).append(CommandUtils.NL);
-        CommandUtils.delay();
-        sb.append(au20vSendOrderQueryRefRange("1", 5)).append(CommandUtils.NL);
-        CommandUtils.delay();
-        sb.append(au20vSendResults("1")).append(CommandUtils.NL);
-        CommandUtils.delay();
-        sb.append(au20vSendError()).append(CommandUtils.NL);
-        CommandUtils.delay();
-        sb.append(au20vFullSequence("2")).append(CommandUtils.NL);
-        CommandUtils.delay();
-        sb.append(au20vDisconnect());
-        return sb.toString();
+        var out = ctx.outputWriter();
+        CommandUtils.printAndDelay(out, au20vConnect(host, port));
+        CommandUtils.printAndDelay(out, au20vSendOrderQuery("1", 5));
+        CommandUtils.printAndDelay(out, au20vSendOrderQueryRefRange("1", 5));
+        CommandUtils.printAndDelay(out, au20vSendResults("1"));
+        CommandUtils.printAndDelay(out, au20vSendError());
+        CommandUtils.printAndDelay(out, au20vFullSequence("2"));
+        return au20vDisconnect();
     }
 
     @Command(name = "au20v disconnect", description = "Disconnect AU20V")

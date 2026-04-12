@@ -1,5 +1,7 @@
 package net.czpilar.vet.analyzer.testclient.command;
 
+import java.io.PrintWriter;
+
 final class CommandUtils {
 
     static final String NL = System.lineSeparator();
@@ -7,6 +9,12 @@ final class CommandUtils {
     private static final long DEFAULT_DELAY_MS = 300;
 
     private CommandUtils() {
+    }
+
+    static void printAndDelay(PrintWriter writer, String message) {
+        writer.println(message);
+        writer.flush();
+        delay();
     }
 
     static void delay() {

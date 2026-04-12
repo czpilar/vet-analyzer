@@ -1,6 +1,7 @@
 package net.czpilar.vet.analyzer.testclient.command;
 
 import net.czpilar.vet.analyzer.testclient.simulator.TcpDeviceSimulator;
+import org.springframework.shell.core.command.CommandContext;
 import org.springframework.shell.core.command.annotation.Command;
 import org.springframework.shell.core.command.annotation.Option;
 import org.springframework.stereotype.Component;
@@ -59,19 +60,15 @@ public class RawCommands {
 
     @Command(name = "raw all", description = "Connect, send various unknown messages, disconnect")
     public String rawAll(
+            CommandContext ctx,
             @Option(longName = "host", defaultValue = "localhost") String host,
             @Option(longName = "port", defaultValue = "9012") Integer port) {
-        var sb = new StringBuilder();
-        sb.append(rawConnect(host, port)).append(CommandUtils.NL);
-        CommandUtils.delay();
-        sb.append(rawSend("Hello from unknown device")).append(CommandUtils.NL);
-        CommandUtils.delay();
-        sb.append(rawSend("SOME_PROPRIETARY_PROTOCOL:DATA1:DATA2:DATA3")).append(CommandUtils.NL);
-        CommandUtils.delay();
-        sb.append(rawSend("{\"type\":\"json\",\"value\":42}")).append(CommandUtils.NL);
-        CommandUtils.delay();
-        sb.append(rawDisconnect());
-        return sb.toString();
+        var out = ctx.outputWriter();
+        CommandUtils.printAndDelay(out, rawConnect(host, port));
+        CommandUtils.printAndDelay(out, rawSend("Hello from unknown device"));
+        CommandUtils.printAndDelay(out, rawSend("SOME_PROPRIETARY_PROTOCOL:DATA1:DATA2:DATA3"));
+        CommandUtils.printAndDelay(out, rawSend("{\"type\":\"json\",\"value\":42}"));
+        return rawDisconnect();
     }
 
     @Command(name = "raw disconnect", description = "Disconnect unknown device")

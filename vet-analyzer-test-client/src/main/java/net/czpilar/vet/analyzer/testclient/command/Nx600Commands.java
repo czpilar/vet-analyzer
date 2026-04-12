@@ -2,6 +2,7 @@ package net.czpilar.vet.analyzer.testclient.command;
 
 import net.czpilar.vet.analyzer.testclient.data.Nx600SampleDataGenerator;
 import net.czpilar.vet.analyzer.testclient.simulator.fujifilm.FujifilmDeviceSimulator;
+import org.springframework.shell.core.command.CommandContext;
 import org.springframework.shell.core.command.annotation.Command;
 import org.springframework.shell.core.command.annotation.Option;
 import org.springframework.stereotype.Component;
@@ -91,7 +92,7 @@ public class Nx600Commands {
         }
         try {
             simulator.sendMessage(dataGenerator.generateStartMessage(sampleNumber));
-            Thread.sleep(500);
+            CommandUtils.delay(500);
             simulator.sendMessage(dataGenerator.generateResultMessage(sampleNumber));
             return "Sent full NX600 sequence (S + R) for sample " + sampleNumber;
         } catch (Exception e) {
@@ -114,23 +115,17 @@ public class Nx600Commands {
 
     @Command(name = "nx600 all", description = "Connect, send all message types, disconnect")
     public String nx600All(
+            CommandContext ctx,
             @Option(longName = "host", defaultValue = "localhost") String host,
             @Option(longName = "port", defaultValue = "9012") Integer port) {
-        var sb = new StringBuilder();
-        sb.append(nx600Connect(host, port)).append(CommandUtils.NL);
-        CommandUtils.delay();
-        sb.append(nx600SendWorklistQuery("1", 3)).append(CommandUtils.NL);
-        CommandUtils.delay();
-        sb.append(nx600SendSampleInfo("1")).append(CommandUtils.NL);
-        CommandUtils.delay();
-        sb.append(nx600SendStart("1")).append(CommandUtils.NL);
-        CommandUtils.delay();
-        sb.append(nx600SendResults("1")).append(CommandUtils.NL);
-        CommandUtils.delay();
-        sb.append(nx600SendError()).append(CommandUtils.NL);
-        CommandUtils.delay();
-        sb.append(nx600Disconnect());
-        return sb.toString();
+        var out = ctx.outputWriter();
+        CommandUtils.printAndDelay(out, nx600Connect(host, port));
+        CommandUtils.printAndDelay(out, nx600SendWorklistQuery("1", 3));
+        CommandUtils.printAndDelay(out, nx600SendSampleInfo("1"));
+        CommandUtils.printAndDelay(out, nx600SendStart("1"));
+        CommandUtils.printAndDelay(out, nx600SendResults("1"));
+        CommandUtils.printAndDelay(out, nx600SendError());
+        return nx600Disconnect();
     }
 
     @Command(name = "nx600 disconnect", description = "Disconnect NX600")

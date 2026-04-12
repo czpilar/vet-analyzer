@@ -2,6 +2,7 @@ package net.czpilar.vet.analyzer.testclient.command;
 
 import net.czpilar.vet.analyzer.testclient.data.Hl7SampleDataGenerator;
 import net.czpilar.vet.analyzer.testclient.simulator.hl7.Hl7DeviceSimulator;
+import org.springframework.shell.core.command.CommandContext;
 import org.springframework.shell.core.command.annotation.Command;
 import org.springframework.shell.core.command.annotation.Option;
 import org.springframework.stereotype.Component;
@@ -43,17 +44,14 @@ public class Hl7Commands {
 
     @Command(name = "hl7 all", description = "Connect, send all message types, disconnect")
     public String hl7All(
+            CommandContext ctx,
             @Option(longName = "host", defaultValue = "localhost") String host,
             @Option(longName = "port", defaultValue = "9012") Integer port) {
-        var sb = new StringBuilder();
-        sb.append(hl7Connect(host, port)).append(CommandUtils.NL);
-        CommandUtils.delay();
-        sb.append(hl7SendResults("68")).append(CommandUtils.NL);
-        CommandUtils.delay();
-        sb.append(hl7SendResults("69")).append(CommandUtils.NL);
-        CommandUtils.delay();
-        sb.append(hl7Disconnect());
-        return sb.toString();
+        var out = ctx.outputWriter();
+        CommandUtils.printAndDelay(out, hl7Connect(host, port));
+        CommandUtils.printAndDelay(out, hl7SendResults("68"));
+        CommandUtils.printAndDelay(out, hl7SendResults("69"));
+        return hl7Disconnect();
     }
 
     @Command(name = "hl7 disconnect", description = "Disconnect BM850/EXIGO H400")
