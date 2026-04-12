@@ -99,6 +99,27 @@ public class Au20vCommands {
         }
     }
 
+    @Command(name = "au20v all", description = "Connect, send all message types, disconnect")
+    public String au20vAll(
+            @Option(longName = "host", defaultValue = "localhost") String host,
+            @Option(longName = "port", defaultValue = "9012") Integer port) {
+        var sb = new StringBuilder();
+        sb.append(au20vConnect(host, port)).append(CommandUtils.NL);
+        CommandUtils.delay();
+        sb.append(au20vSendOrderQuery("1", 5)).append(CommandUtils.NL);
+        CommandUtils.delay();
+        sb.append(au20vSendOrderQueryRefRange("1", 5)).append(CommandUtils.NL);
+        CommandUtils.delay();
+        sb.append(au20vSendResults("1")).append(CommandUtils.NL);
+        CommandUtils.delay();
+        sb.append(au20vSendError()).append(CommandUtils.NL);
+        CommandUtils.delay();
+        sb.append(au20vFullSequence("2")).append(CommandUtils.NL);
+        CommandUtils.delay();
+        sb.append(au20vDisconnect());
+        return sb.toString();
+    }
+
     @Command(name = "au20v disconnect", description = "Disconnect AU20V")
     public String au20vDisconnect() {
         if (simulator == null) {

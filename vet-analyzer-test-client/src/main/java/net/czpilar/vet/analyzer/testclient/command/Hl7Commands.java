@@ -41,6 +41,21 @@ public class Hl7Commands {
         }
     }
 
+    @Command(name = "hl7 all", description = "Connect, send all message types, disconnect")
+    public String hl7All(
+            @Option(longName = "host", defaultValue = "localhost") String host,
+            @Option(longName = "port", defaultValue = "9012") Integer port) {
+        var sb = new StringBuilder();
+        sb.append(hl7Connect(host, port)).append(CommandUtils.NL);
+        CommandUtils.delay();
+        sb.append(hl7SendResults("68")).append(CommandUtils.NL);
+        CommandUtils.delay();
+        sb.append(hl7SendResults("69")).append(CommandUtils.NL);
+        CommandUtils.delay();
+        sb.append(hl7Disconnect());
+        return sb.toString();
+    }
+
     @Command(name = "hl7 disconnect", description = "Disconnect BM850/EXIGO H400")
     public String hl7Disconnect() {
         if (simulator == null) {

@@ -112,6 +112,27 @@ public class Nx600Commands {
         }
     }
 
+    @Command(name = "nx600 all", description = "Connect, send all message types, disconnect")
+    public String nx600All(
+            @Option(longName = "host", defaultValue = "localhost") String host,
+            @Option(longName = "port", defaultValue = "9012") Integer port) {
+        var sb = new StringBuilder();
+        sb.append(nx600Connect(host, port)).append(CommandUtils.NL);
+        CommandUtils.delay();
+        sb.append(nx600SendWorklistQuery("1", 3)).append(CommandUtils.NL);
+        CommandUtils.delay();
+        sb.append(nx600SendSampleInfo("1")).append(CommandUtils.NL);
+        CommandUtils.delay();
+        sb.append(nx600SendStart("1")).append(CommandUtils.NL);
+        CommandUtils.delay();
+        sb.append(nx600SendResults("1")).append(CommandUtils.NL);
+        CommandUtils.delay();
+        sb.append(nx600SendError()).append(CommandUtils.NL);
+        CommandUtils.delay();
+        sb.append(nx600Disconnect());
+        return sb.toString();
+    }
+
     @Command(name = "nx600 disconnect", description = "Disconnect NX600")
     public String nx600Disconnect() {
         if (simulator == null) {
