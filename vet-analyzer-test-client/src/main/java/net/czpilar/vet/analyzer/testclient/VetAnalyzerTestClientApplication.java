@@ -1,8 +1,5 @@
 package net.czpilar.vet.analyzer.testclient;
 
-import net.czpilar.vet.analyzer.testclient.command.Au20vCommands;
-import net.czpilar.vet.analyzer.testclient.command.Hl7Commands;
-import net.czpilar.vet.analyzer.testclient.command.Nx600Commands;
 import org.jline.utils.AttributedString;
 import org.jline.utils.AttributedStyle;
 import org.springframework.boot.SpringApplication;
