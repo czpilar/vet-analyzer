@@ -2,6 +2,8 @@ spring:
   shell:
     interactive:
       enabled: true
+    history:
+      name: vet-analyzer-test-client.log
 
 logging:
   level:

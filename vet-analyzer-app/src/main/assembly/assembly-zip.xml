@@ -6,7 +6,8 @@
     <formats>
         <format>zip</format>
     </formats>
-    <includeBaseDirectory>false</includeBaseDirectory>
+    <includeBaseDirectory>true</includeBaseDirectory>
+    <baseDirectory>vet-analyzer-${project.version}</baseDirectory>
 
     <fileSets>
         <!-- bin scripts -->
