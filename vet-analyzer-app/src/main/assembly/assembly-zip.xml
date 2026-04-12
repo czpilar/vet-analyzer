@@ -1,0 +1,60 @@
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.2.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.2.0 https://maven.apache.org/xsd/assembly-2.2.0.xsd">
+
+    <id>dist</id>
+    <formats>
+        <format>zip</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+
+    <fileSets>
+        <!-- bin scripts -->
+        <fileSet>
+            <directory>${project.build.directory}/classes/bin</directory>
+            <outputDirectory>bin</outputDirectory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+            <fileMode>0755</fileMode>
+        </fileSet>
+
+        <!-- config -->
+        <fileSet>
+            <directory>${project.build.directory}/classes/config</directory>
+            <outputDirectory>config</outputDirectory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+        </fileSet>
+
+        <!-- empty sessions directory -->
+        <fileSet>
+            <directory>.</directory>
+            <outputDirectory>sessions</outputDirectory>
+            <excludes>
+                <exclude>**/*</exclude>
+            </excludes>
+        </fileSet>
+    </fileSets>
+
+    <dependencySets>
+        <!-- server JAR -->
+        <dependencySet>
+            <outputDirectory>lib</outputDirectory>
+            <includes>
+                <include>net.czpilar.vet.analyzer:vet-analyzer-server</include>
+            </includes>
+            <useProjectArtifact>false</useProjectArtifact>
+        </dependencySet>
+
+        <!-- test client JAR -->
+        <dependencySet>
+            <outputDirectory>lib</outputDirectory>
+            <includes>
+                <include>net.czpilar.vet.analyzer:vet-analyzer-test-client</include>
+            </includes>
+            <useProjectArtifact>false</useProjectArtifact>
+        </dependencySet>
+    </dependencySets>
+</assembly>

@@ -1,0 +1,9 @@
+vet:
+  analyzer:
+    server:
+      port: 9012
+      session-directory: ./sessions
+
+logging:
+  level:
+    net.czpilar.vet.analyzer: DEBUG

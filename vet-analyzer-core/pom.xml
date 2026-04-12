@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>net.czpilar.vet.analyzer</groupId>
+        <artifactId>vet-analyzer-root</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>vet-analyzer-core</artifactId>
+    <packaging>jar</packaging>
+    <name>vet-analyzer-core</name>
+    <description>Core library for veterinary analyzer protocol parsing</description>
+
+    <dependencies>
+        <!-- HAPI HL7 -->
+        <dependency>
+            <groupId>ca.uhn.hapi</groupId>
+            <artifactId>hapi-base</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ca.uhn.hapi</groupId>
+            <artifactId>hapi-structures-v27</artifactId>
+        </dependency>
+
+        <!-- Commons -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+
+        <!-- Logging -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+
+        <!-- Test -->
+        <dependency>
+            <groupId>org.spockframework</groupId>
+            <artifactId>spock-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.groovy</groupId>
+            <artifactId>groovy</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.gmavenplus</groupId>
+                <artifactId>gmavenplus-plugin</artifactId>
+                <configuration>
+                    <targetBytecode>${java.target}</targetBytecode>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>compileTests</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

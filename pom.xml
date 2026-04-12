@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>net.czpilar.vet.analyzer</groupId>
+    <artifactId>vet-analyzer-root</artifactId>
+    <packaging>pom</packaging>
+    <version>1.0.0-SNAPSHOT</version>
+    <name>vet-analyzer-root</name>
+    <description>Vet Analyzer - Veterinary Lab Analyzer Communication Server</description>
+
+    <developers>
+        <developer>
+            <id>czpilar</id>
+            <name>David Pilar</name>
+            <email>david@czpilar.net</email>
+            <url>https://czpilar.net</url>
+            <organization>czpilar.net</organization>
+            <organizationUrl>https://czpilar.net</organizationUrl>
+        </developer>
+    </developers>
+
+    <modules>
+        <module>vet-analyzer-core</module>
+        <module>vet-analyzer-server</module>
+        <module>vet-analyzer-test-client</module>
+        <module>vet-analyzer-app</module>
+    </modules>
+
+    <properties>
+        <java.target>25</java.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- dependency versions -->
+        <version.spring-boot>4.0.5</version.spring-boot>
+        <version.spring-shell>4.0.1</version.spring-shell>
+        <version.commons-lang3>3.20.0</version.commons-lang3>
+        <version.hapi>2.5.1</version.hapi>
+        <version.netty>4.1.119.Final</version.netty>
+        <version.slf4j>2.0.17</version.slf4j>
+        <version.logback>1.5.32</version.logback>
+        <version.junit>6.1.0-M1</version.junit>
+        <version.mockito>5.23.0</version.mockito>
+        <version.spock>2.4-groovy-5.0</version.spock>
+        <version.groovy>5.0.5</version.groovy>
+
+        <!-- plugin versions -->
+        <version.plugin.maven-compiler-plugin>3.15.0</version.plugin.maven-compiler-plugin>
+        <version.plugin.maven-surefire-plugin>3.5.5</version.plugin.maven-surefire-plugin>
+        <version.plugin.maven-jar-plugin>3.5.0</version.plugin.maven-jar-plugin>
+        <version.plugin.maven-assembly-plugin>3.8.0</version.plugin.maven-assembly-plugin>
+        <version.plugin.maven-resources-plugin>3.5.0</version.plugin.maven-resources-plugin>
+        <version.plugin.spring-boot-maven-plugin>4.0.5</version.plugin.spring-boot-maven-plugin>
+        <version.plugin.gmavenplus-plugin>4.3.1</version.plugin.gmavenplus-plugin>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${version.spring-boot}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- project modules -->
+            <dependency>
+                <groupId>net.czpilar.vet.analyzer</groupId>
+                <artifactId>vet-analyzer-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- HAPI HL7 -->
+            <dependency>
+                <groupId>ca.uhn.hapi</groupId>
+                <artifactId>hapi-base</artifactId>
+                <version>${version.hapi}</version>
+            </dependency>
+            <dependency>
+                <groupId>ca.uhn.hapi</groupId>
+                <artifactId>hapi-structures-v27</artifactId>
+                <version>${version.hapi}</version>
+            </dependency>
+
+            <!-- Commons -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${version.commons-lang3}</version>
+            </dependency>
+
+            <!-- Logging -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${version.slf4j}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>${version.logback}</version>
+            </dependency>
+
+            <!-- Netty -->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-all</artifactId>
+                <version>${version.netty}</version>
+            </dependency>
+
+            <!-- Testing -->
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${version.junit}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>${version.mockito}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <!-- Spock / Groovy -->
+            <dependency>
+                <groupId>org.spockframework</groupId>
+                <artifactId>spock-core</artifactId>
+                <version>${version.spock}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.groovy</groupId>
+                <artifactId>groovy</artifactId>
+                <version>${version.groovy}</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${version.plugin.maven-compiler-plugin}</version>
+                    <configuration>
+                        <source>${java.target}</source>
+                        <target>${java.target}</target>
+                        <encoding>${project.build.sourceEncoding}</encoding>
+                        <parameters>true</parameters>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${version.plugin.maven-surefire-plugin}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>${version.plugin.maven-jar-plugin}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>${version.plugin.maven-resources-plugin}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <version>${version.plugin.maven-assembly-plugin}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>${version.plugin.spring-boot-maven-plugin}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.gmavenplus</groupId>
+                    <artifactId>gmavenplus-plugin</artifactId>
+                    <version>${version.plugin.gmavenplus-plugin}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>
