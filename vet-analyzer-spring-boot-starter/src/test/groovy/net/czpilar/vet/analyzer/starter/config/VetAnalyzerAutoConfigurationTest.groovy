@@ -14,7 +14,7 @@ class VetAnalyzerAutoConfigurationTest extends Specification {
 
     def "auto-configuration creates beans when enabled"() {
         expect:
-        runner.withPropertyValues("vet.analyzer.server.port=19012")
+        runner.withPropertyValues("vet.analyzer.server.port=19012", "vet.analyzer.server.auto-start=false")
                 .withBean(AnalyzerMessageListener, { new TestListener() })
                 .run { context ->
                     assert context.containsBean("vetAnalyzerMessageParserRegistry")
@@ -37,7 +37,8 @@ class VetAnalyzerAutoConfigurationTest extends Specification {
         expect:
         runner.withPropertyValues(
                     "vet.analyzer.server.port=${port}",
-                    "vet.analyzer.server.session-directory=${dir}"
+                    "vet.analyzer.server.session-directory=${dir}",
+                    "vet.analyzer.server.auto-start=false"
                 )
                 .withBean(AnalyzerMessageListener, { new TestListener() })
                 .run { context ->
@@ -48,9 +49,9 @@ class VetAnalyzerAutoConfigurationTest extends Specification {
 
         where:
         port  | dir
-        9012  | "./sessions"
-        5050  | "/tmp/analyzer"
-        8888  | "C:/data/sessions"
+        19012 | "./sessions"
+        15050 | "/tmp/analyzer"
+        18888 | "C:/data/sessions"
     }
 
     static class TestListener implements AnalyzerMessageListener {

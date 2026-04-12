@@ -1,5 +1,6 @@
 package net.czpilar.vet.analyzer.testclient;
 
+import net.czpilar.vet.analyzer.testclient.command.ConnectionState;
 import org.jline.utils.AttributedString;
 import org.jline.utils.AttributedStyle;
 import org.springframework.boot.SpringApplication;
@@ -15,7 +16,7 @@ public class VetAnalyzerTestClientApplication {
     }
 
     @Bean
-    public PromptProvider promptProvider() {
-        return () -> new AttributedString("vet:analyzer> ", AttributedStyle.DEFAULT.foreground(AttributedStyle.YELLOW));
+    public PromptProvider promptProvider(ConnectionState connectionState) {
+        return () -> new AttributedString(connectionState.getPrompt(), AttributedStyle.DEFAULT.foreground(AttributedStyle.YELLOW));
     }
 }

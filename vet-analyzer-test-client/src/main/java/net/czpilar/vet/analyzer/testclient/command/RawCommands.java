@@ -1,5 +1,6 @@
 package net.czpilar.vet.analyzer.testclient.command;
 
+import net.czpilar.vet.analyzer.testclient.simulator.DeviceSimulator;
 import net.czpilar.vet.analyzer.testclient.simulator.TcpDeviceSimulator;
 import org.springframework.shell.core.command.CommandContext;
 import org.springframework.shell.core.command.annotation.Command;
@@ -13,49 +14,46 @@ import java.nio.charset.StandardCharsets;
  * Useful for testing how the server handles unrecognized protocols.
  */
 @Component
-public class RawCommands {
+public class RawCommands extends AbstractDeviceCommands {
 
-    private TcpDeviceSimulator simulator;
+    public RawCommands(ConnectionState connectionState) {
+        super(connectionState);
+    }
+
+    @Override
+    protected String deviceName() { return "raw"; }
+
+    @Override
+    protected String displayName() { return "raw device"; }
+
+    @Override
+    protected DeviceSimulator createSimulator(String host, int port) {
+        return new RawDeviceSimulator(host, port);
+    }
 
     @Command(name = "raw connect", description = "Connect as unknown device (no protocol framing)")
     public String rawConnect(
             @Option(longName = "host", defaultValue = "localhost") String host,
             @Option(longName = "port", defaultValue = "9012") Integer port) {
-        try {
-            simulator = new RawDeviceSimulator(host, port);
-            simulator.connect();
-            return "Connected to " + host + ":" + port + " as raw/unknown device";
-        } catch (Exception e) {
-            return "Connection failed: " + e.getMessage();
-        }
+        return doConnect(host, port);
     }
 
     @Command(name = "raw send", description = "Send arbitrary text message")
     public String rawSend(
             @Option(longName = "message", defaultValue = "Hello from unknown device") String message) {
-        if (simulator == null || !simulator.isConnected()) {
-            return "Not connected. Use 'raw connect' first.";
-        }
-        try {
-            simulator.sendMessage(message);
+        return whenConnected(() -> {
+            getSimulator().sendMessage(message);
             return "Sent raw message: " + message;
-        } catch (Exception e) {
-            return "Send failed: " + e.getMessage();
-        }
+        });
     }
 
     @Command(name = "raw send binary", description = "Send binary data as hex string (e.g. '48454C4C4F')")
     public String rawSendBinary(
             @Option(longName = "hex") String hex) {
-        if (simulator == null || !simulator.isConnected()) {
-            return "Not connected. Use 'raw connect' first.";
-        }
-        try {
-            simulator.sendMessage(hex);
+        return whenConnected(() -> {
+            getSimulator().sendMessage(hex);
             return "Sent raw binary data (" + hex.length() / 2 + " bytes)";
-        } catch (Exception e) {
-            return "Send failed: " + e.getMessage();
-        }
+        });
     }
 
     @Command(name = "raw all", description = "Connect, send various unknown messages, disconnect")
@@ -73,21 +71,9 @@ public class RawCommands {
 
     @Command(name = "raw disconnect", description = "Disconnect unknown device")
     public String rawDisconnect() {
-        if (simulator == null) {
-            return "Not connected.";
-        }
-        try {
-            simulator.disconnect();
-            simulator = null;
-            return "Disconnected.";
-        } catch (Exception e) {
-            return "Disconnect failed: " + e.getMessage();
-        }
+        return doDisconnect();
     }
 
-    /**
-     * Simple raw TCP simulator - no protocol framing, just plain text.
-     */
     private static class RawDeviceSimulator extends TcpDeviceSimulator {
 
         RawDeviceSimulator(String host, int port) {
