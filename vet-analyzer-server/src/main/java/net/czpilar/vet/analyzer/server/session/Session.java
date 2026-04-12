@@ -15,9 +15,11 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+
 public class Session {
 
     private static final Logger log = LoggerFactory.getLogger(Session.class);
+    private static final String NL = System.lineSeparator();
     private static final DateTimeFormatter TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
             .withZone(ZoneId.systemDefault());
 
@@ -44,18 +46,18 @@ public class Session {
     }
 
     private void writeHeader() throws IOException {
-        writer.write("=== SESSION START ===\n");
-        writer.write("Session ID: " + sessionId + "\n");
-        writer.write("Remote: " + remoteAddress + "\n");
-        writer.write("Started: " + TIMESTAMP_FORMAT.format(startedAt) + "\n");
-        writer.write("\n");
+        writer.write("=== SESSION START ===" + NL);
+        writer.write("Session ID: " + sessionId + NL);
+        writer.write("Remote: " + remoteAddress + NL);
+        writer.write("Started: " + TIMESTAMP_FORMAT.format(startedAt) + NL);
+        writer.write(NL);
         writer.flush();
     }
 
     public void updateAnalyzerType(AnalyzerType type) throws IOException {
         this.detectedType = type;
-        writer.write("Analyzer: " + type.displayName() + " (" + type.category() + ") [auto-detected]\n");
-        writer.write("\n");
+        writer.write("Analyzer: " + type.displayName() + " (" + type.category() + ") [auto-detected]" + NL);
+        writer.write(NL);
         writer.flush();
     }
 
@@ -64,52 +66,52 @@ public class Session {
 
         String msgType = parsedMessage != null ? parsedMessage.messageDescription() : "UNKNOWN";
 
-        writer.write("--- MESSAGE [" + msgType + "] @ " + timestamp + " ---\n");
+        writer.write("--- MESSAGE [" + msgType + "] @ " + timestamp + " ---" + NL);
         writer.write(rawData);
-        if (!rawData.endsWith("\n")) {
-            writer.write("\n");
+        if (!rawData.endsWith(NL)) {
+            writer.write(NL);
         }
 
         if (parsedMessage != null) {
-            writer.write("--- PARSED ---\n");
+            writer.write("--- PARSED ---" + NL);
             writeParsedSummary(parsedMessage);
         }
 
-        writer.write("--- END MESSAGE ---\n\n");
+        writer.write("--- END MESSAGE ---" + NL + NL);
         writer.flush();
     }
 
     private void writeParsedSummary(AnalyzerMessage message) throws IOException {
         switch (message) {
             case Hl7Message hl7 -> {
-                writer.write("Type: " + hl7.messageType() + " (HL7 " + hl7.hl7Version() + ")\n");
-                writer.write("Sample: " + hl7.sampleId() + "\n");
+                writer.write("Type: " + hl7.messageType() + " (HL7 " + hl7.hl7Version() + ")" + NL);
+                writer.write("Sample: " + hl7.sampleId() + NL);
                 writer.write("Tests: ");
                 var results = hl7.observations().stream()
                         .filter(o -> "NM".equals(o.valueType()))
                         .map(o -> o.observationId() + "=" + o.value() + " " + o.unit())
                         .toList();
                 writer.write(String.join(", ", results));
-                writer.write("\n");
+                writer.write(NL);
             }
             case FujifilmResultMessage result -> {
-                writer.write("Type: " + result.command().name() + " (" + result.command().description() + ")\n");
+                writer.write("Type: " + result.command().name() + " (" + result.command().description() + ")" + NL);
                 writer.write("Sample: " + result.sampleNumber() + ", Patient: " + result.patientId()
-                        + ", Species: " + result.speciesCode() + "\n");
+                        + ", Species: " + result.speciesCode() + NL);
                 writer.write("Tests: ");
                 var results = result.testResults().stream()
                         .map(t -> t.toMeasurementResult().toString())
                         .toList();
                 writer.write(String.join(", ", results));
-                writer.write("\n");
+                writer.write(NL);
             }
-            default -> writer.write("Type: " + message.messageDescription() + "\n");
+            default -> writer.write("Type: " + message.messageDescription() + NL);
         }
     }
 
     public void close() {
         try {
-            writer.write("=== SESSION END === " + TIMESTAMP_FORMAT.format(Instant.now()) + "\n");
+            writer.write("=== SESSION END === " + TIMESTAMP_FORMAT.format(Instant.now()) + NL);
             writer.close();
             log.info("Session {} closed, file: {}", sessionId, sessionFile);
         } catch (IOException e) {

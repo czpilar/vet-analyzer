@@ -78,7 +78,7 @@ public abstract class AbstractFujifilmParser<T extends FujifilmMessage> implemen
      * Parses test results from fields array starting at given index.
      * Each test result consists of 7 fields:
      * testCode, relation, value+unit (combined field), dilutionFactor, rangeLow, rangeHigh, flag
-     *
+     * <p>
      * In real data the value and unit are in one fixed-width field, e.g. "74       g/l   "
      * which we split into value and unit parts.
      */

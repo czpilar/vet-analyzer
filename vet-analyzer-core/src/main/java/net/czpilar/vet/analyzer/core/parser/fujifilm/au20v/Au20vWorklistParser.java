@@ -10,7 +10,7 @@ import java.time.Instant;
 /**
  * Parses AU20V X/Y (order index query) command.
  * Format: X,sampleNo,patientId,patientName,numberOfRequests
- *     or: Y,sampleNo,patientId,patientName,numberOfRequests (with reference interval range)
+ * or: Y,sampleNo,patientId,patientName,numberOfRequests (with reference interval range)
  */
 public class Au20vWorklistParser extends AbstractFujifilmParser<FujifilmWorklistQueryMessage> {
 

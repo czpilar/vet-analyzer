@@ -12,8 +12,8 @@ import java.util.List;
 /**
  * Parses AU20V T/R (measurement results) command.
  * Format: T,status,date,time,sampleNo,patientId,patientName,species,sex,age,samplePos,numTests,
- *         testCode1,relation1,valueUnit1,dilution1,rangeLow1,rangeHigh1,flag1,...
- *
+ * testCode1,relation1,valueUnit1,dilution1,rangeLow1,rangeHigh1,flag1,...
+ * <p>
  * AU20V uses T for results (and sometimes R). Max 5 tests per sample.
  */
 public class Au20vResultParser extends AbstractFujifilmParser<FujifilmResultMessage> {

@@ -13,7 +13,7 @@ import org.springframework.shell.jline.PromptProvider;
 @SpringBootApplication
 public class VetAnalyzerTestClientApplication {
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         SpringApplication.run(VetAnalyzerTestClientApplication.class, args);
     }
 

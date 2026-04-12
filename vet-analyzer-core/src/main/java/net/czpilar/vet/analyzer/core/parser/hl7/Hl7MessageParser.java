@@ -26,7 +26,7 @@ public class Hl7MessageParser implements MessageParser<Hl7Message> {
 
     @Override
     public Hl7Message parse(String rawData) {
-        String[] segments = rawData.split("\\r|\\n");
+        String[] segments = rawData.split("[\\r\\n]");
 
         String messageControlId = "";
         String messageType = "";

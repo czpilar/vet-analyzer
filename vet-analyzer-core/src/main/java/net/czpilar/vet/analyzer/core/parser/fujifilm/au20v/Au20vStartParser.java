@@ -1,7 +1,5 @@
 package net.czpilar.vet.analyzer.core.parser.fujifilm.au20v;
 
-import net.czpilar.vet.analyzer.core.model.AnalyzerType;
-import net.czpilar.vet.analyzer.core.model.fujifilm.FujifilmStartMessage;
 import net.czpilar.vet.analyzer.core.parser.fujifilm.nx600.Nx600StartParser;
 
 /**

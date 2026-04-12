@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Parses NX600 R (measurement results) command.
  * Format: R,status,date,time,sampleNo,patientId,patientName,species,sex,age,samplePos,numTests,
- *         testCode1,relation1,valueUnit1,dilution1,rangeLow1,rangeHigh1,flag1,...
+ * testCode1,relation1,valueUnit1,dilution1,rangeLow1,rangeHigh1,flag1,...
  */
 public class Nx600ResultParser extends AbstractFujifilmParser<FujifilmResultMessage> {
 
