@@ -4,3 +4,4 @@ target
 /sessions
 /.claude
 /*.iml
+/spring-shell.log

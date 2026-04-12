@@ -4,20 +4,20 @@ Communication server for veterinary laboratory analyzers.
 
 ## Supported Analyzers
 
-| Analyzer | Manufacturer | Type | Protocol |
-|---|---|---|---|
-| BM850 / EXIGO H400 | Boule Medical | Hematology | HL7 v2.7 over MLLP/TCP |
-| NX600 Series | Fujifilm | Biochemistry | Custom STX/ETX over TCP or RS-232C |
-| AU20V | Fujifilm | Immunoassay | Custom STX/ETX over TCP |
+| Analyzer           | Manufacturer  | Type         | Protocol                           |
+|--------------------|---------------|--------------|------------------------------------|
+| BM850 / EXIGO H400 | Boule Medical | Hematology   | HL7 v2.7 over MLLP/TCP             |
+| NX600 Series       | Fujifilm      | Biochemistry | Custom STX/ETX over TCP or RS-232C |
+| AU20V              | Fujifilm      | Immunoassay  | Custom STX/ETX over TCP            |
 
 ## Project Structure
 
-| Module | Description |
-|---|---|
-| `vet-analyzer-core` | Core library - protocol handling, message models, parsers. No Spring dependency, usable as standalone JAR. |
-| `vet-analyzer-server` | Spring Boot TCP server with Netty. Auto-detects analyzer type from incoming data. Logs sessions to files. |
-| `vet-analyzer-test-client` | Spring Shell interactive client simulating all 3 analyzer types. |
-| `vet-analyzer-app` | Distribution package - produces ZIP with scripts, JARs, and configuration. |
+| Module                     | Description                                                                                                |
+|----------------------------|------------------------------------------------------------------------------------------------------------|
+| `vet-analyzer-core`        | Core library - protocol handling, message models, parsers. No Spring dependency, usable as standalone JAR. |
+| `vet-analyzer-server`      | Spring Boot TCP server with Netty. Auto-detects analyzer type from incoming data. Logs sessions to files.  |
+| `vet-analyzer-test-client` | Spring Shell interactive client simulating all 3 analyzer types.                                           |
+| `vet-analyzer-app`         | Distribution package - produces ZIP with scripts, JARs, and configuration.                                 |
 
 ## Build
 

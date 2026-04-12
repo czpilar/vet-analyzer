@@ -4,14 +4,16 @@ import net.czpilar.vet.analyzer.testclient.data.Nx600SampleDataGenerator;
 import net.czpilar.vet.analyzer.testclient.simulator.fujifilm.FujifilmDeviceSimulator;
 import org.springframework.shell.core.command.annotation.Command;
 import org.springframework.shell.core.command.annotation.Option;
+import org.springframework.stereotype.Component;
 
+@Component
 public class Nx600Commands {
 
     private FujifilmDeviceSimulator simulator;
     private final Nx600SampleDataGenerator dataGenerator = new Nx600SampleDataGenerator();
 
-    @Command(name = "nx600-connect", description = "Connect as Fujifilm NX600 analyzer")
-    public String connect(
+    @Command(name = "nx600 connect", description = "Connect as Fujifilm NX600 analyzer")
+    public String nx600Connect(
             @Option(longName = "host", defaultValue = "localhost") String host,
             @Option(longName = "port", defaultValue = "9012") int port) {
         try {
@@ -23,11 +25,11 @@ public class Nx600Commands {
         }
     }
 
-    @Command(name = "nx600-send-results", description = "Send biochemistry results")
-    public String sendResults(
+    @Command(name = "nx600 send results", description = "Send biochemistry results")
+    public String nx600SendResults(
             @Option(longName = "sampleNumber", defaultValue = "1") String sampleNumber) {
         if (simulator == null || !simulator.isConnected()) {
-            return "Not connected. Use 'nx600-connect' first.";
+            return "Not connected. Use 'nx600 connect' first.";
         }
         try {
             String message = dataGenerator.generateResultMessage(sampleNumber);
@@ -38,11 +40,11 @@ public class Nx600Commands {
         }
     }
 
-    @Command(name = "nx600-send-start", description = "Send test start notification")
-    public String sendStart(
+    @Command(name = "nx600 send start", description = "Send test start notification")
+    public String nx600SendStart(
             @Option(longName = "sampleNumber", defaultValue = "1") String sampleNumber) {
         if (simulator == null || !simulator.isConnected()) {
-            return "Not connected. Use 'nx600-connect' first.";
+            return "Not connected. Use 'nx600 connect' first.";
         }
         try {
             simulator.sendMessage(dataGenerator.generateStartMessage(sampleNumber));
@@ -52,12 +54,12 @@ public class Nx600Commands {
         }
     }
 
-    @Command(name = "nx600-send-worklist", description = "Send worklist query")
-    public String sendWorklistQuery(
+    @Command(name = "nx600 send worklist", description = "Send worklist query")
+    public String nx600SendWorklistQuery(
             @Option(longName = "sampleNumber", defaultValue = "") String sampleNumber,
             @Option(longName = "count", defaultValue = "3") int count) {
         if (simulator == null || !simulator.isConnected()) {
-            return "Not connected. Use 'nx600-connect' first.";
+            return "Not connected. Use 'nx600 connect' first.";
         }
         try {
             simulator.sendMessage(dataGenerator.generateWorklistQuery(sampleNumber, count));
@@ -67,11 +69,11 @@ public class Nx600Commands {
         }
     }
 
-    @Command(name = "nx600-full-sequence", description = "Run full NX600 bidirectional sequence (S -> R)")
-    public String fullSequence(
+    @Command(name = "nx600 full sequence", description = "Run full NX600 bidirectional sequence (S -> R)")
+    public String nx600FullSequence(
             @Option(longName = "sampleNumber", defaultValue = "1") String sampleNumber) {
         if (simulator == null || !simulator.isConnected()) {
-            return "Not connected. Use 'nx600-connect' first.";
+            return "Not connected. Use 'nx600 connect' first.";
         }
         try {
             simulator.sendMessage(dataGenerator.generateStartMessage(sampleNumber));
@@ -83,8 +85,8 @@ public class Nx600Commands {
         }
     }
 
-    @Command(name = "nx600-disconnect", description = "Disconnect NX600")
-    public String disconnect() {
+    @Command(name = "nx600 disconnect", description = "Disconnect NX600")
+    public String nx600Disconnect() {
         if (simulator == null) {
             return "Not connected.";
         }
