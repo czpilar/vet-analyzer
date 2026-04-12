@@ -10,6 +10,17 @@
     <baseDirectory>vet-analyzer-${project.version}</baseDirectory>
 
     <fileSets>
+        <!-- docs -->
+        <fileSet>
+            <directory>${project.basedir}/..</directory>
+            <outputDirectory>docs</outputDirectory>
+            <includes>
+                <include>LICENSE.txt</include>
+                <include>NOTICE.txt</include>
+                <include>README.md</include>
+            </includes>
+        </fileSet>
+
         <!-- bin scripts -->
         <fileSet>
             <directory>${project.build.directory}/classes/bin</directory>
