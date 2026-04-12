@@ -88,6 +88,11 @@ public class VetAnalyzerServerLifecycle implements SmartLifecycle {
     }
 
     @Override
+    public boolean isAutoStartup() {
+        return properties.isAutoStart();
+    }
+
+    @Override
     public int getPhase() {
         return Integer.MAX_VALUE - 1; // Start late, stop early
     }

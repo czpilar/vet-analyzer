@@ -6,6 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class VetAnalyzerProperties {
 
     private boolean enabled = true;
+    private boolean autoStart = true;
     private int port = 9012;
     private String sessionDirectory = "./sessions";
 
@@ -15,6 +16,14 @@ public class VetAnalyzerProperties {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public boolean isAutoStart() {
+        return autoStart;
+    }
+
+    public void setAutoStart(boolean autoStart) {
+        this.autoStart = autoStart;
     }
 
     public int getPort() {

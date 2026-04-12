@@ -236,10 +236,47 @@ vet:
   analyzer:
     server:
       enabled: true
+      auto-start: true
       port: 9012
 ```
 
+| Property                                 | Default      | Description                                   |
+|------------------------------------------|--------------|-----------------------------------------------|
+| `vet.analyzer.server.enabled`            | `true`       | Enable/disable auto-configuration entirely    |
+| `vet.analyzer.server.auto-start`         | `true`       | Start TCP server automatically on app startup |
+| `vet.analyzer.server.port`               | `9012`       | TCP port to listen on                         |
+| `vet.analyzer.server.session-directory`  | `./sessions` | Directory for session log files               |
+
 The TCP server starts automatically alongside your application (e.g. Tomcat on port 8080 + analyzer server on port 9012). Multiple `AnalyzerMessageListener` beans can be registered - all will be notified.
+
+### 4. Programmatic control (optional)
+
+When `auto-start` is set to `false`, the server bean is created but not started. You can start/stop it programmatically - e.g. based on user action or database configuration:
+
+```java
+@Service
+public class AnalyzerService {
+
+    @Autowired
+    private VetAnalyzerServerLifecycle analyzerServer;
+
+    public void startAnalyzerServer() {
+        if (!analyzerServer.isRunning()) {
+            analyzerServer.start();
+        }
+    }
+
+    public void stopAnalyzerServer() {
+        if (analyzerServer.isRunning()) {
+            analyzerServer.stop();
+        }
+    }
+
+    public boolean isAnalyzerServerRunning() {
+        return analyzerServer.isRunning();
+    }
+}
+```
 
 ## Using Core Library Standalone
 
