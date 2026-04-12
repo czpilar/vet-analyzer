@@ -35,6 +35,13 @@ Produces ZIP distribution in `vet-analyzer-app/target/vet-analyzer-app-<version>
 
 ```
 bin/vet-analyzer-server.bat
+bin/vet-analyzer-server.sh
+```
+
+Or run via Maven:
+
+```
+./mvnw -pl vet-analyzer-server spring-boot:run
 ```
 
 Server listens on a single TCP port (default 9012) and auto-detects the analyzer type from the first incoming message:
@@ -60,29 +67,43 @@ vet:
 
 ```
 bin/vet-analyzer-test-client.bat
+bin/vet-analyzer-test-client.sh
 ```
 
-Available commands:
+Or run via Maven:
+
+```
+./mvnw -pl vet-analyzer-test-client spring-boot:run
+```
+
+Available commands (prompt: `vet:analyzer>`):
 
 **BM850/EXIGO H400 (HL7):**
-- `hl7-connect` - connect to server
-- `hl7-send-results` - send hematology results (RBC, WBC, HGB, PLT, ...)
-- `hl7-disconnect`
+- `hl7 connect` - connect to server
+- `hl7 send results` - send hematology results (RBC, WBC, HGB, PLT, ...)
+- `hl7 all` - connect, send all message types, disconnect
+- `hl7 disconnect`
 
 **Fujifilm NX600 (Biochemistry):**
-- `nx600-connect` - connect to server
-- `nx600-send-results` - send biochemistry results (TP, ALP, GLU, GPT, CRE, BUN, ...)
-- `nx600-send-start` - send test start notification
-- `nx600-send-worklist` - send worklist query
-- `nx600-full-sequence` - run full S -> R sequence
-- `nx600-disconnect`
+- `nx600 connect` - connect to server
+- `nx600 send results` - send biochemistry results (TP, ALP, GLU, GPT, CRE, BUN, ...)
+- `nx600 send start` - send test start notification
+- `nx600 send worklist` - send worklist query
+- `nx600 send sample info` - send sample info query
+- `nx600 send error` - send error notification
+- `nx600 full sequence` - run full S -> R sequence
+- `nx600 all` - connect, send all message types, disconnect
+- `nx600 disconnect`
 
 **Fujifilm AU20V (Immunoassay):**
-- `au20v-connect` - connect to server
-- `au20v-send-results` - send immunoassay results (v-PRG, v-TSH, v-T4, ...)
-- `au20v-send-order-query` - send order query
-- `au20v-full-sequence` - run full S -> T sequence
-- `au20v-disconnect`
+- `au20v connect` - connect to server
+- `au20v send results` - send immunoassay results (v-PRG, v-TSH, v-T4, ...)
+- `au20v send order query` - send order query
+- `au20v send order query ref range` - send order query with reference interval range
+- `au20v send error` - send error notification
+- `au20v full sequence` - run full S -> T sequence
+- `au20v all` - connect, send all message types, disconnect
+- `au20v disconnect`
 
 ## Session Log Format
 

@@ -3,8 +3,8 @@ package net.czpilar.vet.analyzer.server.config;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.MultiThreadIoEventLoopGroup;
+import io.netty.channel.nio.NioIoHandler;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import net.czpilar.vet.analyzer.core.parser.MessageParserRegistry;
@@ -38,8 +38,8 @@ public class TcpServerConfig {
                                             SessionManager sessionManager,
                                             MessageParserRegistry parserRegistry) {
         return args -> {
-            EventLoopGroup bossGroup = new NioEventLoopGroup(1);
-            EventLoopGroup workerGroup = new NioEventLoopGroup();
+            var bossGroup = new MultiThreadIoEventLoopGroup(1, NioIoHandler.newFactory());
+            var workerGroup = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());
 
             var bootstrap = new ServerBootstrap();
             bootstrap.group(bossGroup, workerGroup)
