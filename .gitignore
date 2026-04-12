@@ -7,3 +7,4 @@ target
 /spring-shell.log
 /vet-analyzer-test-client/spring-shell.log
 /vet-analyzer-test-client/*.log
+/vet-analyzer-server/sessions

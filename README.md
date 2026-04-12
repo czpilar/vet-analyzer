@@ -95,12 +95,32 @@ Each TCP connection creates a session log file in the `sessions/` directory cont
 Edit `config/application.yml`:
 
 ```yaml
+server:
+  port: 8090
+
 vet:
   analyzer:
     server:
-      enabled: true
       port: 9012
       session-directory: ./sessions
+```
+
+### REST API
+
+The standalone server includes a REST API for managing the TCP analyzer server:
+
+| Method | URL                    | Description                    |
+|--------|------------------------|--------------------------------|
+| GET    | `/api/analyzer/status` | Returns `{"running": true}`    |
+| POST   | `/api/analyzer/start`  | Starts the TCP analyzer server |
+| POST   | `/api/analyzer/stop`   | Stops the TCP analyzer server  |
+
+Example:
+
+```
+curl http://localhost:8090/api/analyzer/status
+curl -X POST http://localhost:8090/api/analyzer/start
+curl -X POST http://localhost:8090/api/analyzer/stop
 ```
 
 ## Test Client Commands
