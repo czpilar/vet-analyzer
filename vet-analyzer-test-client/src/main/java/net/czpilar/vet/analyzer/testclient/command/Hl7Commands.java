@@ -40,8 +40,13 @@ public class Hl7Commands extends AbstractDeviceCommands {
             @Option(longName = "sampleId", defaultValue = "68") String sampleId) {
         return whenConnected(() -> {
             getSimulator().sendMessage(dataGenerator.generateResultMessage(sampleId));
-            String ack = getSimulator().receiveResponse();
-            return "Sent HL7 results for sample " + sampleId + ". ACK: " + (ack != null ? "received" : "none");
+            String ack;
+            try {
+                ack = getSimulator().receiveResponse();
+            } catch (Exception e) {
+                ack = null;
+            }
+            return "Sent HL7 results for sample " + sampleId + ". ACK: " + (ack != null ? "received" : "not received");
         });
     }
 

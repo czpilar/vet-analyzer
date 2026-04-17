@@ -48,8 +48,13 @@ public class Hl7ChannelHandler extends SimpleChannelInboundHandler<String> {
         // Send ACK
         if (parsed instanceof Hl7Message hl7) {
             String ack = Hl7Protocol.createAck(hl7.messageControlId());
-            ctx.writeAndFlush(ack);
-            log.debug("Sent ACK for message control ID: {}", hl7.messageControlId());
+            ctx.writeAndFlush(ack).addListener(future -> {
+                if (future.isSuccess()) {
+                    log.debug("Sent ACK for message control ID: {}", hl7.messageControlId());
+                } else {
+                    log.warn("Failed to send ACK for message control ID: {}", hl7.messageControlId(), future.cause());
+                }
+            });
         }
     }
 
