@@ -3,12 +3,14 @@ package net.czpilar.vet.analyzer.starter.tcp.codec;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import io.netty.handler.timeout.IdleStateHandler;
 import net.czpilar.vet.analyzer.core.listener.AnalyzerMessageListener;
 import net.czpilar.vet.analyzer.core.parser.MessageParserRegistry;
 import net.czpilar.vet.analyzer.core.protocol.ControlCharacters;
 import net.czpilar.vet.analyzer.core.protocol.hl7.Hl7Protocol;
 import net.czpilar.vet.analyzer.starter.tcp.handler.FujifilmChannelHandler;
 import net.czpilar.vet.analyzer.starter.tcp.handler.Hl7ChannelHandler;
+import net.czpilar.vet.analyzer.starter.tcp.handler.IdleDisconnectHandler;
 import net.czpilar.vet.analyzer.starter.tcp.handler.RawChannelHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class ProtocolDetector extends ByteToMessageDecoder {
 
@@ -23,10 +26,14 @@ public class ProtocolDetector extends ByteToMessageDecoder {
 
     private final MessageParserRegistry parserRegistry;
     private final List<AnalyzerMessageListener> listeners;
+    private final int idleTimeoutSeconds;
 
-    public ProtocolDetector(MessageParserRegistry parserRegistry, List<AnalyzerMessageListener> listeners) {
+    public ProtocolDetector(MessageParserRegistry parserRegistry,
+                            List<AnalyzerMessageListener> listeners,
+                            int idleTimeoutSeconds) {
         this.parserRegistry = parserRegistry;
         this.listeners = listeners;
+        this.idleTimeoutSeconds = idleTimeoutSeconds;
     }
 
     @Override
@@ -46,6 +53,12 @@ public class ProtocolDetector extends ByteToMessageDecoder {
         in.getBytes(in.readerIndex(), peek);
 
         var pipeline = ctx.pipeline();
+
+        // Idle timeout - close connection if no data received
+        if (idleTimeoutSeconds > 0) {
+            pipeline.addLast("idleState", new IdleStateHandler(idleTimeoutSeconds, 0, 0, TimeUnit.SECONDS));
+            pipeline.addLast("idleDisconnect", new IdleDisconnectHandler());
+        }
 
         if (Hl7Protocol.isHl7(peek)) {
             log.info("Detected HL7/MLLP protocol from {}", remoteAddress);

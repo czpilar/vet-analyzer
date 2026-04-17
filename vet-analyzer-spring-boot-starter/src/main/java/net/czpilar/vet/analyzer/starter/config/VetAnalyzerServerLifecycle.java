@@ -53,7 +53,7 @@ public class VetAnalyzerServerLifecycle implements SmartLifecycle {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) {
-                            ch.pipeline().addLast(new ProtocolDetector(parserRegistry, listeners));
+                            ch.pipeline().addLast(new ProtocolDetector(parserRegistry, listeners, properties.getIdleTimeoutSeconds()));
                         }
                     });
 
