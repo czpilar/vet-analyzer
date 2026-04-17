@@ -8,6 +8,8 @@ import org.springframework.shell.core.command.annotation.Command;
 import org.springframework.shell.core.command.annotation.Option;
 import org.springframework.stereotype.Component;
 
+import java.io.PrintWriter;
+
 @Component
 public class Au20vCommands extends AbstractDeviceCommands {
 
@@ -88,7 +90,7 @@ public class Au20vCommands extends AbstractDeviceCommands {
             CommandContext ctx,
             @Option(longName = "host", defaultValue = "localhost") String host,
             @Option(longName = "port", defaultValue = "9012") Integer port) {
-        var out = ctx.outputWriter();
+        PrintWriter out = ctx.outputWriter();
         CommandUtils.printAndDelay(out, au20vConnect(host, port));
         CommandUtils.printAndDelay(out, au20vSendOrderQuery("1", 5));
         CommandUtils.printAndDelay(out, au20vSendOrderQueryRefRange("1", 5));

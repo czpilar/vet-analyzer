@@ -29,7 +29,7 @@ public class SessionFileListener implements AnalyzerMessageListener {
     @Override
     public void onSessionStart(String sessionId, String remoteAddress) {
         try {
-            var session = new Session(sessionId, remoteAddress, sessionDirectory);
+            Session session = new Session(sessionId, remoteAddress, sessionDirectory);
             sessions.put(sessionId, session);
             log.info("Session file created: {} for {}", session.getSessionFile(), remoteAddress);
         } catch (IOException e) {
@@ -39,7 +39,7 @@ public class SessionFileListener implements AnalyzerMessageListener {
 
     @Override
     public void onMessage(AnalyzerMessage message, String rawData, String remoteAddress) {
-        var session = findSession(remoteAddress);
+        Session session = findSession(remoteAddress);
         if (session == null) {
             return;
         }
@@ -55,7 +55,7 @@ public class SessionFileListener implements AnalyzerMessageListener {
 
     @Override
     public void onRawMessage(String rawData, String remoteAddress) {
-        var session = findSession(remoteAddress);
+        Session session = findSession(remoteAddress);
         if (session == null) {
             return;
         }
@@ -68,7 +68,7 @@ public class SessionFileListener implements AnalyzerMessageListener {
 
     @Override
     public void onSessionEnd(String sessionId) {
-        var session = sessions.remove(sessionId);
+        Session session = sessions.remove(sessionId);
         if (session != null) {
             session.close();
         }

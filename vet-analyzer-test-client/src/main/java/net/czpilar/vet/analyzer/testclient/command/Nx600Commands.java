@@ -8,6 +8,8 @@ import org.springframework.shell.core.command.annotation.Command;
 import org.springframework.shell.core.command.annotation.Option;
 import org.springframework.stereotype.Component;
 
+import java.io.PrintWriter;
+
 @Component
 public class Nx600Commands extends AbstractDeviceCommands {
 
@@ -96,7 +98,7 @@ public class Nx600Commands extends AbstractDeviceCommands {
             CommandContext ctx,
             @Option(longName = "host", defaultValue = "localhost") String host,
             @Option(longName = "port", defaultValue = "9012") Integer port) {
-        var out = ctx.outputWriter();
+        PrintWriter out = ctx.outputWriter();
         CommandUtils.printAndDelay(out, nx600Connect(host, port));
         CommandUtils.printAndDelay(out, nx600SendWorklistQuery("1", 3));
         CommandUtils.printAndDelay(out, nx600SendSampleInfo("1"));

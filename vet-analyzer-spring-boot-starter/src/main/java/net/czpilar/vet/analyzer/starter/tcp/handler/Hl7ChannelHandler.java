@@ -3,6 +3,7 @@ package net.czpilar.vet.analyzer.starter.tcp.handler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import net.czpilar.vet.analyzer.core.listener.AnalyzerMessageListener;
+import net.czpilar.vet.analyzer.core.model.AnalyzerMessage;
 import net.czpilar.vet.analyzer.core.model.hl7.Hl7Message;
 import net.czpilar.vet.analyzer.core.parser.MessageParserRegistry;
 import net.czpilar.vet.analyzer.core.protocol.hl7.Hl7Protocol;
@@ -33,14 +34,14 @@ public class Hl7ChannelHandler extends SimpleChannelInboundHandler<String> {
     protected void channelRead0(ChannelHandlerContext ctx, String msg) {
         log.info("Received HL7 message ({} bytes) in session {}", msg.length(), sessionId);
 
-        var parsed = parserRegistry.parse(msg);
+        AnalyzerMessage parsed = parserRegistry.parse(msg);
 
         if (parsed != null) {
-            for (var listener : listeners) {
+            for (AnalyzerMessageListener listener : listeners) {
                 listener.onMessage(parsed, msg, remoteAddress);
             }
         } else {
-            for (var listener : listeners) {
+            for (AnalyzerMessageListener listener : listeners) {
                 listener.onRawMessage(msg, remoteAddress);
             }
         }
@@ -60,7 +61,7 @@ public class Hl7ChannelHandler extends SimpleChannelInboundHandler<String> {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
-        for (var listener : listeners) {
+        for (AnalyzerMessageListener listener : listeners) {
             listener.onSessionEnd(sessionId);
         }
     }

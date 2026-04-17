@@ -12,7 +12,7 @@ public record MeasurementResult(
 ) {
     @Override
     public String toString() {
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         sb.append(testCode).append(relation).append(value).append(" ").append(unit);
         if (rangeLow != null && rangeHigh != null && !rangeLow.isBlank() && !rangeHigh.isBlank()) {
             sb.append(" [").append(rangeLow).append("-").append(rangeHigh).append("]");

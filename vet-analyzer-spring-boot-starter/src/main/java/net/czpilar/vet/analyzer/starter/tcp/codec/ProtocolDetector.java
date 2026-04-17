@@ -2,6 +2,7 @@ package net.czpilar.vet.analyzer.starter.tcp.codec;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.timeout.IdleStateHandler;
 import net.czpilar.vet.analyzer.core.listener.AnalyzerMessageListener;
@@ -45,14 +46,14 @@ public class ProtocolDetector extends ByteToMessageDecoder {
         String remoteAddress = ((InetSocketAddress) ctx.channel().remoteAddress()).getAddress().getHostAddress();
         String sessionId = UUID.randomUUID().toString().substring(0, 8);
 
-        for (var listener : listeners) {
+        for (AnalyzerMessageListener listener : listeners) {
             listener.onSessionStart(sessionId, remoteAddress);
         }
 
         byte[] peek = new byte[Math.min(4, in.readableBytes())];
         in.getBytes(in.readerIndex(), peek);
 
-        var pipeline = ctx.pipeline();
+        ChannelPipeline pipeline = ctx.pipeline();
 
         // Idle timeout - close connection if no data received
         if (idleTimeoutSeconds > 0) {

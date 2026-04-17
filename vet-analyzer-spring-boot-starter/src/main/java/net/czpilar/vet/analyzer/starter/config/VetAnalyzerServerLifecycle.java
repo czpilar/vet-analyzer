@@ -47,7 +47,7 @@ public class VetAnalyzerServerLifecycle implements SmartLifecycle {
             bossGroup = new MultiThreadIoEventLoopGroup(1, NioIoHandler.newFactory());
             workerGroup = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());
 
-            var bootstrap = new ServerBootstrap();
+            ServerBootstrap bootstrap = new ServerBootstrap();
             bootstrap.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
                     .childHandler(new ChannelInitializer<SocketChannel>() {

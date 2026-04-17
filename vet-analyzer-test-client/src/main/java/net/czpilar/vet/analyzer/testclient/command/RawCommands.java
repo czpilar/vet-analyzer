@@ -7,6 +7,7 @@ import org.springframework.shell.core.command.annotation.Command;
 import org.springframework.shell.core.command.annotation.Option;
 import org.springframework.stereotype.Component;
 
+import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -61,7 +62,7 @@ public class RawCommands extends AbstractDeviceCommands {
             CommandContext ctx,
             @Option(longName = "host", defaultValue = "localhost") String host,
             @Option(longName = "port", defaultValue = "9012") Integer port) {
-        var out = ctx.outputWriter();
+        PrintWriter out = ctx.outputWriter();
         CommandUtils.printAndDelay(out, rawConnect(host, port));
         CommandUtils.printAndDelay(out, rawSend("Hello from unknown device"));
         CommandUtils.printAndDelay(out, rawSend("SOME_PROPRIETARY_PROTOCOL:DATA1:DATA2:DATA3"));

@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.List;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -87,7 +88,7 @@ public class Session {
                 writer.write("Type: " + hl7.messageType() + " (HL7 " + hl7.hl7Version() + ")" + NL);
                 writer.write("Sample: " + hl7.sampleId() + NL);
                 writer.write("Tests: ");
-                var results = hl7.observations().stream()
+                List<String> results = hl7.observations().stream()
                         .filter(o -> "NM".equals(o.valueType()))
                         .map(o -> o.observationId() + "=" + o.value() + " " + o.unit())
                         .toList();
@@ -99,7 +100,7 @@ public class Session {
                 writer.write("Sample: " + result.sampleNumber() + ", Patient: " + result.patientId()
                         + ", Species: " + result.speciesCode() + NL);
                 writer.write("Tests: ");
-                var results = result.testResults().stream()
+                List<String> results = result.testResults().stream()
                         .map(t -> t.toMeasurementResult().toString())
                         .toList();
                 writer.write(String.join(", ", results));

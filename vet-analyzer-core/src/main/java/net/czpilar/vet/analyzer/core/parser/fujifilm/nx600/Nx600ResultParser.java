@@ -7,6 +7,8 @@ import net.czpilar.vet.analyzer.core.parser.fujifilm.AbstractFujifilmParser;
 import net.czpilar.vet.analyzer.core.protocol.fujifilm.FujifilmCommand;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 /**
@@ -29,8 +31,8 @@ public class Nx600ResultParser extends AbstractFujifilmParser<FujifilmResultMess
 
         // R,status,date,time,sampleNo,patientId,patientName,species,sex,age,samplePos,numTests,...
         String status = fields.length > 1 ? trimField(fields[1]) : "";
-        var date = fields.length > 2 ? parseDate(fields[2]) : null;
-        var time = fields.length > 3 ? parseTime(fields[3]) : null;
+        LocalDate date = fields.length > 2 ? parseDate(fields[2]) : null;
+        LocalTime time = fields.length > 3 ? parseTime(fields[3]) : null;
         String sampleNumber = fields.length > 4 ? trimField(fields[4]) : "";
         String patientId = fields.length > 5 ? trimField(fields[5]) : "";
         String patientName = fields.length > 6 ? trimField(fields[6]) : "";

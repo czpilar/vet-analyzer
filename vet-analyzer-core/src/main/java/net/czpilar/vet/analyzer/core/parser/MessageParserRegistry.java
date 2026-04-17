@@ -40,7 +40,7 @@ public class MessageParserRegistry {
      * then NX600 parsers (R, I, W, S, E), then HL7.
      */
     public static MessageParserRegistry createDefault() {
-        var parsers = new ArrayList<MessageParser<?>>();
+        List<MessageParser<?>> parsers = new ArrayList<>();
 
         // AU20V-specific parsers first (unique commands T, X, Y)
         parsers.add(new Au20vResultParser());

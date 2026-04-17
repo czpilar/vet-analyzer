@@ -26,14 +26,14 @@ public class RawChannelHandler extends SimpleChannelInboundHandler<String> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, String msg) {
         log.warn("Received unknown message ({} bytes) in session {}", msg.length(), sessionId);
-        for (var listener : listeners) {
+        for (AnalyzerMessageListener listener : listeners) {
             listener.onRawMessage(msg, remoteAddress);
         }
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
-        for (var listener : listeners) {
+        for (AnalyzerMessageListener listener : listeners) {
             listener.onSessionEnd(sessionId);
         }
     }
