@@ -2,7 +2,7 @@ package net.czpilar.vet.analyzer.server.session;
 
 import net.czpilar.vet.analyzer.core.listener.AnalyzerMessageListener;
 import net.czpilar.vet.analyzer.core.model.AnalyzerMessage;
-import net.czpilar.vet.analyzer.starter.config.VetAnalyzerProperties;
+import net.czpilar.vet.analyzer.server.config.SessionProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,8 +22,8 @@ public class SessionFileListener implements AnalyzerMessageListener {
     private final Path sessionDirectory;
     private final Map<String, Session> sessions = new ConcurrentHashMap<>();
 
-    public SessionFileListener(VetAnalyzerProperties properties) {
-        this.sessionDirectory = Path.of(properties.getSessionDirectory());
+    public SessionFileListener(SessionProperties properties) {
+        this.sessionDirectory = Path.of(properties.getDirectory());
     }
 
     @Override

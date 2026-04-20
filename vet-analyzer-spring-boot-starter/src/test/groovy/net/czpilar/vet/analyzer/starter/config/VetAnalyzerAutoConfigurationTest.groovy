@@ -33,25 +33,25 @@ class VetAnalyzerAutoConfigurationTest extends Specification {
                 }
     }
 
-    def "properties are bound correctly for port=#port, dir='#dir'"() {
+    def "properties are bound correctly for port=#port, idleTimeout=#idleTimeout"() {
         expect:
         runner.withPropertyValues(
                     "vet.analyzer.server.port=${port}",
-                    "vet.analyzer.server.session-directory=${dir}",
+                    "vet.analyzer.server.idle-timeout-seconds=${idleTimeout}",
                     "vet.analyzer.server.auto-start=false"
                 )
                 .withBean(AnalyzerMessageListener, { new TestListener() })
                 .run { context ->
                     def props = context.getBean(VetAnalyzerProperties)
                     assert props.port == port
-                    assert props.sessionDirectory == dir
+                    assert props.idleTimeoutSeconds == idleTimeout
                 }
 
         where:
-        port  | dir
-        19012 | "./sessions"
-        15050 | "/tmp/analyzer"
-        18888 | "C:/data/sessions"
+        port  | idleTimeout
+        19012 | 60
+        15050 | 120
+        18888 | 0
     }
 
     static class TestListener implements AnalyzerMessageListener {

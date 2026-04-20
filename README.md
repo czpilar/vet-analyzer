@@ -102,7 +102,8 @@ vet:
   analyzer:
     server:
       port: 9012
-      session-directory: ./sessions
+    session:
+      directory: ./sessions
 ```
 
 ### REST API
@@ -260,13 +261,12 @@ vet:
       port: 9012
 ```
 
-| Property                                   | Default      | Description                                         |
-|--------------------------------------------|--------------|-----------------------------------------------------|
-| `vet.analyzer.server.enabled`              | `true`       | Enable/disable auto-configuration entirely          |
-| `vet.analyzer.server.auto-start`           | `true`       | Start TCP server automatically on app startup       |
-| `vet.analyzer.server.port`                 | `9012`       | TCP port to listen on                               |
-| `vet.analyzer.server.idle-timeout-seconds` | `300`        | Close idle connections after N seconds (0=disabled) |
-| `vet.analyzer.server.session-directory`    | `./sessions` | Directory for session log files                     |
+| Property                                   | Default | Description                                         |
+|--------------------------------------------|---------|-----------------------------------------------------|
+| `vet.analyzer.server.enabled`              | `true`  | Enable/disable auto-configuration entirely          |
+| `vet.analyzer.server.auto-start`           | `true`  | Start TCP server automatically on app startup       |
+| `vet.analyzer.server.port`                 | `9012`  | TCP port to listen on                               |
+| `vet.analyzer.server.idle-timeout-seconds` | `300`   | Close idle connections after N seconds (0=disabled) |
 
 The TCP server starts automatically alongside your application (e.g. Tomcat on port 8080 + analyzer server on port 9012). Multiple `AnalyzerMessageListener` beans can be registered - all will be notified.
 

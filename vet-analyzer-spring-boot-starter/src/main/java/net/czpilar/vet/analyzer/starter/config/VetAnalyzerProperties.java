@@ -9,7 +9,6 @@ public class VetAnalyzerProperties {
     private boolean autoStart = true;
     private int port = 9012;
     private int idleTimeoutSeconds = 300;
-    private String sessionDirectory = "./sessions";
 
     public boolean isEnabled() {
         return enabled;
@@ -43,11 +42,4 @@ public class VetAnalyzerProperties {
         this.idleTimeoutSeconds = idleTimeoutSeconds;
     }
 
-    public String getSessionDirectory() {
-        return sessionDirectory;
-    }
-
-    public void setSessionDirectory(String sessionDirectory) {
-        this.sessionDirectory = sessionDirectory;
-    }
 }

@@ -4,7 +4,7 @@ import net.czpilar.vet.analyzer.core.model.AnalyzerType
 import net.czpilar.vet.analyzer.core.model.fujifilm.FujifilmResultMessage
 import net.czpilar.vet.analyzer.core.model.fujifilm.FujifilmTestResult
 import net.czpilar.vet.analyzer.core.protocol.fujifilm.FujifilmCommand
-import net.czpilar.vet.analyzer.starter.config.VetAnalyzerProperties
+import net.czpilar.vet.analyzer.server.config.SessionProperties
 import spock.lang.Specification
 import spock.lang.TempDir
 
@@ -84,8 +84,8 @@ class SessionFileListenerTest extends Specification {
     }
 
     private SessionFileListener createListener() {
-        def props = new VetAnalyzerProperties()
-        props.setSessionDirectory(tempDir.toString())
+        def props = new SessionProperties()
+        props.setDirectory(tempDir.toString())
         return new SessionFileListener(props)
     }
 
