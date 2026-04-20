@@ -29,6 +29,9 @@ public class ProtocolDetector extends ByteToMessageDecoder {
     private final List<AnalyzerMessageListener> listeners;
     private final int idleTimeoutSeconds;
 
+    private String sessionId;
+    private String remoteAddress;
+
     public ProtocolDetector(MessageParserRegistry parserRegistry,
                             List<AnalyzerMessageListener> listeners,
                             int idleTimeoutSeconds) {
@@ -38,28 +41,46 @@ public class ProtocolDetector extends ByteToMessageDecoder {
     }
 
     @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        this.sessionId = UUID.randomUUID().toString().substring(0, 8);
+        this.remoteAddress = ((InetSocketAddress) ctx.channel().remoteAddress()).getAddress().getHostAddress();
+
+        log.info("Client connected: {} (session {})", remoteAddress, sessionId);
+        for (AnalyzerMessageListener listener : listeners) {
+            listener.onSessionStart(sessionId, remoteAddress);
+        }
+
+        // Idle timeout - close connection if no data received (even if no protocol detected yet)
+        if (idleTimeoutSeconds > 0) {
+            ctx.pipeline().addFirst("idleState", new IdleStateHandler(idleTimeoutSeconds, 0, 0, TimeUnit.SECONDS));
+            ctx.pipeline().addAfter("idleState", "idleDisconnect", new IdleDisconnectHandler());
+        }
+
+        super.channelActive(ctx);
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        // If no protocol was detected (client disconnected without sending data), end session here
+        if (sessionId != null && ctx.pipeline().get("handler") == null) {
+            log.info("Client disconnected before sending data: {} (session {})", remoteAddress, sessionId);
+            for (AnalyzerMessageListener listener : listeners) {
+                listener.onSessionEnd(sessionId);
+            }
+        }
+        super.channelInactive(ctx);
+    }
+
+    @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
         if (in.readableBytes() < 4) {
             return;
-        }
-
-        String remoteAddress = ((InetSocketAddress) ctx.channel().remoteAddress()).getAddress().getHostAddress();
-        String sessionId = UUID.randomUUID().toString().substring(0, 8);
-
-        for (AnalyzerMessageListener listener : listeners) {
-            listener.onSessionStart(sessionId, remoteAddress);
         }
 
         byte[] peek = new byte[Math.min(4, in.readableBytes())];
         in.getBytes(in.readerIndex(), peek);
 
         ChannelPipeline pipeline = ctx.pipeline();
-
-        // Idle timeout - close connection if no data received
-        if (idleTimeoutSeconds > 0) {
-            pipeline.addLast("idleState", new IdleStateHandler(idleTimeoutSeconds, 0, 0, TimeUnit.SECONDS));
-            pipeline.addLast("idleDisconnect", new IdleDisconnectHandler());
-        }
 
         if (Hl7Protocol.isHl7(peek)) {
             log.info("Detected HL7/MLLP protocol from {}", remoteAddress);
