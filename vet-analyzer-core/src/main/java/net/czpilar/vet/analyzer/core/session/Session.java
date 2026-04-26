@@ -1,4 +1,4 @@
-package net.czpilar.vet.analyzer.server.session;
+package net.czpilar.vet.analyzer.core.session;
 
 import net.czpilar.vet.analyzer.core.model.AnalyzerMessage;
 import net.czpilar.vet.analyzer.core.model.AnalyzerType;
@@ -36,9 +36,8 @@ public class Session {
         this.remoteAddress = remoteAddress;
         this.startedAt = Instant.now();
 
-        String timestamp = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss").withZone(ZoneId.systemDefault()).format(startedAt);
-        String safeAddress = remoteAddress.replaceAll("[:/]", "_");
-        this.sessionFile = sessionDirectory.resolve("session_" + timestamp + "_" + safeAddress + "_" + sessionId + ".log");
+        String safeAddress = remoteAddress.replaceAll("[:/.]", "-");
+        this.sessionFile = sessionDirectory.resolve("session_" + sessionId + "_" + safeAddress + ".log");
 
         Files.createDirectories(sessionDirectory);
         this.writer = Files.newBufferedWriter(sessionFile, StandardCharsets.UTF_8);

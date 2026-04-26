@@ -1,10 +1,9 @@
-package net.czpilar.vet.analyzer.server.session
+package net.czpilar.vet.analyzer.core.session
 
 import net.czpilar.vet.analyzer.core.model.AnalyzerType
 import net.czpilar.vet.analyzer.core.model.fujifilm.FujifilmResultMessage
 import net.czpilar.vet.analyzer.core.model.fujifilm.FujifilmTestResult
 import net.czpilar.vet.analyzer.core.protocol.fujifilm.FujifilmCommand
-import net.czpilar.vet.analyzer.server.config.SessionProperties
 import spock.lang.Specification
 import spock.lang.TempDir
 
@@ -21,7 +20,7 @@ class SessionFileListenerTest extends Specification {
 
     def "session lifecycle creates and closes file"() {
         given:
-        def listener = createListener()
+        def listener = new SessionFileListener(tempDir.toString())
 
         when:
         listener.onSessionStart("sess1", "192.168.1.10")
@@ -38,7 +37,7 @@ class SessionFileListenerTest extends Specification {
 
     def "onMessage writes parsed message to session file"() {
         given:
-        def listener = createListener()
+        def listener = new SessionFileListener(tempDir.toString())
         def message = createResultMessage()
 
         when:
@@ -56,7 +55,7 @@ class SessionFileListenerTest extends Specification {
 
     def "onRawMessage writes unknown message to session file"() {
         given:
-        def listener = createListener()
+        def listener = new SessionFileListener(tempDir.toString())
 
         when:
         listener.onSessionStart("sess1", "192.168.1.10")
@@ -71,7 +70,7 @@ class SessionFileListenerTest extends Specification {
 
     def "multiple sessions create separate files"() {
         given:
-        def listener = createListener()
+        def listener = new SessionFileListener(tempDir.toString())
 
         when:
         listener.onSessionStart("sess1", "192.168.1.10")
@@ -83,10 +82,30 @@ class SessionFileListenerTest extends Specification {
         Files.list(tempDir).toList().size() == 2
     }
 
-    private SessionFileListener createListener() {
-        def props = new SessionProperties()
-        props.setDirectory(tempDir.toString())
-        return new SessionFileListener(props)
+    def "constructor creates directory if it does not exist"() {
+        given:
+        def newDir = tempDir.resolve("nested").resolve("subdir")
+        assert !Files.exists(newDir)
+
+        when:
+        new SessionFileListener(newDir.toString())
+
+        then:
+        Files.exists(newDir)
+        Files.isDirectory(newDir)
+    }
+
+    def "constructor accepts existing directory"() {
+        given:
+        def existingDir = Files.createDirectory(tempDir.resolve("existing"))
+
+        when:
+        def listener = new SessionFileListener(existingDir.toString())
+        listener.onSessionStart("sess1", "192.168.1.10")
+        listener.onSessionEnd("sess1")
+
+        then:
+        Files.list(existingDir).toList().size() == 1
     }
 
     private static FujifilmResultMessage createResultMessage() {

@@ -1,19 +1,23 @@
-package net.czpilar.vet.analyzer.server.session;
+package net.czpilar.vet.analyzer.core.session;
 
 import net.czpilar.vet.analyzer.core.listener.AnalyzerMessageListener;
 import net.czpilar.vet.analyzer.core.model.AnalyzerMessage;
-import net.czpilar.vet.analyzer.server.config.SessionProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Default AnalyzerMessageListener implementation that logs messages to session files.
- * Each TCP session gets its own log file with raw and parsed message data.
+ * AnalyzerMessageListener implementation that logs each TCP session into its own
+ * file inside the configured directory. The directory is created on construction
+ * if it does not yet exist.
+ * <p>
+ * Reusable as a generic logging tool — does not depend on Spring.
  */
 public class SessionFileListener implements AnalyzerMessageListener {
 
@@ -22,8 +26,13 @@ public class SessionFileListener implements AnalyzerMessageListener {
     private final Path sessionDirectory;
     private final Map<String, Session> sessions = new ConcurrentHashMap<>();
 
-    public SessionFileListener(SessionProperties properties) {
-        this.sessionDirectory = Path.of(properties.getDirectory());
+    public SessionFileListener(String directory) {
+        this.sessionDirectory = Path.of(directory);
+        try {
+            Files.createDirectories(this.sessionDirectory);
+        } catch (IOException e) {
+            throw new UncheckedIOException("Failed to create session directory: " + this.sessionDirectory, e);
+        }
     }
 
     @Override
