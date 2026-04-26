@@ -17,13 +17,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 public class ProtocolDetector extends ByteToMessageDecoder {
 
     private static final Logger log = LoggerFactory.getLogger(ProtocolDetector.class);
+    private static final DateTimeFormatter SESSION_ID_TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
 
     private final MessageParserRegistry parserRegistry;
     private final List<AnalyzerMessageListener> listeners;
@@ -42,7 +45,7 @@ public class ProtocolDetector extends ByteToMessageDecoder {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        this.sessionId = UUID.randomUUID().toString().substring(0, 8);
+        this.sessionId = generateSessionId();
         this.remoteAddress = ((InetSocketAddress) ctx.channel().remoteAddress()).getAddress().getHostAddress();
 
         log.info("Client connected: {} (session {})", remoteAddress, sessionId);
@@ -98,6 +101,17 @@ public class ProtocolDetector extends ByteToMessageDecoder {
         }
 
         pipeline.remove(this);
+    }
+
+    /**
+     * Session id format: {@code yyyyMMdd-HHmmss-xxxx} (20 chars).
+     * Timestamp prefix is human-readable; 4-hex random suffix avoids collisions
+     * when multiple connections arrive within the same second.
+     */
+    static String generateSessionId() {
+        String timestamp = LocalDateTime.now().format(SESSION_ID_TIMESTAMP_FORMAT);
+        int random = ThreadLocalRandom.current().nextInt(0x10000);
+        return timestamp + "-" + String.format("%04x", random);
     }
 
     private static boolean isFujifilm(byte[] peek) {
