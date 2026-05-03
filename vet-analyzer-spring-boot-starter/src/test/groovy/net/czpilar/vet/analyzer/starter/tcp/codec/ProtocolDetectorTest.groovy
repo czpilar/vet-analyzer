@@ -30,13 +30,17 @@ class ProtocolDetectorTest extends Specification {
         !parsed.isAfter(after.withNano(0).plusSeconds(1))
     }
 
-    def "generateSessionId returns unique values across many calls"() {
+    def "generateSessionId returns mostly unique values across many calls"() {
         when:
-        def ids = (1..1000).collect { ProtocolDetector.generateSessionId() } as Set
+        // Session id = timestamp(yyyyMMdd-HHmmss) + 4-hex random = 65536 buckets.
+        // Calls within the same second share a timestamp; only the 4-hex random part disambiguates.
+        // Birthday paradox for n samples in 65536 buckets:
+        //   expected collisions ~ n^2 / (2 * 65536)
+        //   200 samples -> ~0.3 expected; 500 -> ~1.9; 1000 -> ~7.6 (and previously flaky at >=990)
+        def ids = (1..200).collect { ProtocolDetector.generateSessionId() } as Set
 
         then:
-        // 4-hex random part = 65536 variants, 1000 calls → collision probability ~0.7%
-        // expect at least 990 unique (very generous, prevents flaky test)
-        ids.size() >= 990
+        // Tolerance generous enough to be statistically stable.
+        ids.size() >= 195
     }
 }
