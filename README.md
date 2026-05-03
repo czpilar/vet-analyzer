@@ -278,8 +278,14 @@ When `auto-start` is set to `false`, the server bean is created but not started.
 @Service
 public class AnalyzerService {
 
-    @Autowired
-    private VetAnalyzerServerLifecycle analyzerServer;
+    private final VetAnalyzerServerLifecycle analyzerServer;
+    private final VetAnalyzerProperties analyzerProperties;
+
+    public AnalyzerService(VetAnalyzerServerLifecycle analyzerServer,
+                           VetAnalyzerProperties analyzerProperties) {
+        this.analyzerServer = analyzerServer;
+        this.analyzerProperties = analyzerProperties;
+    }
 
     public void startAnalyzerServer() {
         if (!analyzerServer.isRunning()) {
@@ -296,8 +302,26 @@ public class AnalyzerService {
     public boolean isAnalyzerServerRunning() {
         return analyzerServer.isRunning();
     }
+
+    /**
+     * Change the listening port at runtime - e.g. when the user updates it via UI
+     * or it is loaded from a database. The port is read from {@link VetAnalyzerProperties}
+     * inside {@code start()}, so just stop, mutate, start.
+     */
+    public void changePort(int newPort) {
+        if (analyzerServer.isRunning()) {
+            analyzerServer.stop();
+        }
+        analyzerProperties.setPort(newPort);
+        analyzerServer.start();
+    }
 }
 ```
+
+> The `VetAnalyzerProperties` bean is a regular Spring `@ConfigurationProperties`
+> singleton with mutable setters. `VetAnalyzerServerLifecycle.start()` reads
+> `properties.getPort()` on every invocation, so any port change applies on the
+> next start.
 
 ## Using Core Library Standalone
 
