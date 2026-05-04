@@ -3,6 +3,7 @@ package net.czpilar.vet.analyzer.starter.tcp.handler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import net.czpilar.vet.analyzer.core.listener.AnalyzerMessageListener;
+import net.czpilar.vet.analyzer.core.listener.SessionContext;
 import net.czpilar.vet.analyzer.core.model.AnalyzerMessage;
 import net.czpilar.vet.analyzer.core.model.AnalyzerType;
 import net.czpilar.vet.analyzer.core.model.fujifilm.FujifilmErrorMessage;
@@ -19,25 +20,23 @@ public class FujifilmChannelHandler extends SimpleChannelInboundHandler<String> 
 
     private static final Logger log = LoggerFactory.getLogger(FujifilmChannelHandler.class);
 
-    private final String sessionId;
-    private final String remoteAddress;
+    private final SessionContext session;
     private final MessageParserRegistry parserRegistry;
     private final List<AnalyzerMessageListener> listeners;
 
     private AnalyzerType detectedType;
 
-    public FujifilmChannelHandler(String sessionId, String remoteAddress,
+    public FujifilmChannelHandler(SessionContext session,
                                   MessageParserRegistry parserRegistry,
                                   List<AnalyzerMessageListener> listeners) {
-        this.sessionId = sessionId;
-        this.remoteAddress = remoteAddress;
+        this.session = session;
         this.parserRegistry = parserRegistry;
         this.listeners = listeners;
     }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, String msg) {
-        log.info("Received Fujifilm message ({} bytes) in session {}", msg.length(), sessionId);
+        log.info("Received Fujifilm message ({} bytes) in session {}", msg.length(), session.sessionId());
 
         AnalyzerMessage parsed = parserRegistry.parse(msg);
 
@@ -45,11 +44,11 @@ public class FujifilmChannelHandler extends SimpleChannelInboundHandler<String> 
             updateDetectedType(parsed);
             parsed = applyDetectedType(parsed);
             for (AnalyzerMessageListener listener : listeners) {
-                listener.onMessage(parsed, msg, remoteAddress);
+                listener.onMessage(parsed, msg, session);
             }
         } else {
             for (AnalyzerMessageListener listener : listeners) {
-                listener.onRawMessage(msg, remoteAddress);
+                listener.onRawMessage(msg, session);
             }
         }
     }
@@ -93,13 +92,13 @@ public class FujifilmChannelHandler extends SimpleChannelInboundHandler<String> 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
         for (AnalyzerMessageListener listener : listeners) {
-            listener.onSessionEnd(sessionId);
+            listener.onSessionEnd(session.sessionId());
         }
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        log.error("Error in Fujifilm handler for session {}", sessionId, cause);
+        log.error("Error in Fujifilm handler for session {}", session.sessionId(), cause);
         ctx.close();
     }
 }

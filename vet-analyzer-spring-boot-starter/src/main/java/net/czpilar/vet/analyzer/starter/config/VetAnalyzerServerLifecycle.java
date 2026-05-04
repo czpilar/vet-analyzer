@@ -9,6 +9,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import net.czpilar.vet.analyzer.core.listener.AnalyzerMessageListener;
 import net.czpilar.vet.analyzer.core.parser.MessageParserRegistry;
+import net.czpilar.vet.analyzer.starter.exception.VetAnalyzerServerStartException;
 import net.czpilar.vet.analyzer.starter.tcp.codec.ProtocolDetector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +64,8 @@ public class VetAnalyzerServerLifecycle implements SmartLifecycle {
         } catch (Exception e) {
             log.error("Failed to start Vet Analyzer TCP server on port {}", properties.getPort(), e);
             stop();
-            throw new RuntimeException("Failed to start Vet Analyzer TCP server", e);
+            throw new VetAnalyzerServerStartException(
+                    "Failed to start Vet Analyzer TCP server on port " + properties.getPort(), e);
         }
     }
 

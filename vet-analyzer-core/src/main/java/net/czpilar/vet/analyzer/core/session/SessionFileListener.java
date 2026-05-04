@@ -1,12 +1,13 @@
 package net.czpilar.vet.analyzer.core.session;
 
+import net.czpilar.vet.analyzer.core.exception.SessionDirectoryException;
 import net.czpilar.vet.analyzer.core.listener.AnalyzerMessageListener;
+import net.czpilar.vet.analyzer.core.listener.SessionContext;
 import net.czpilar.vet.analyzer.core.model.AnalyzerMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
@@ -17,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * file inside the configured directory. The directory is created on construction
  * if it does not yet exist.
  * <p>
- * Reusable as a generic logging tool — does not depend on Spring.
+ * Reusable as a generic logging tool - does not depend on Spring.
  */
 public class SessionFileListener implements AnalyzerMessageListener {
 
@@ -31,24 +32,24 @@ public class SessionFileListener implements AnalyzerMessageListener {
         try {
             Files.createDirectories(this.sessionDirectory);
         } catch (IOException e) {
-            throw new UncheckedIOException("Failed to create session directory: " + this.sessionDirectory, e);
+            throw new SessionDirectoryException("Failed to create session directory: " + this.sessionDirectory, e);
         }
     }
 
     @Override
-    public void onSessionStart(String sessionId, String remoteAddress) {
+    public void onSessionStart(SessionContext ctx) {
         try {
-            Session session = new Session(sessionId, remoteAddress, sessionDirectory);
-            sessions.put(sessionId, session);
-            log.info("Session file created: {} for {}", session.getSessionFile(), remoteAddress);
+            Session session = new Session(ctx.sessionId(), ctx.remoteAddress(), sessionDirectory);
+            sessions.put(ctx.sessionId(), session);
+            log.info("Session file created: {} for {}", session.getSessionFile(), ctx.remoteAddress());
         } catch (IOException e) {
-            log.error("Failed to create session file for {}", remoteAddress, e);
+            log.error("Failed to create session file for {}", ctx.remoteAddress(), e);
         }
     }
 
     @Override
-    public void onMessage(AnalyzerMessage message, String rawData, String remoteAddress) {
-        Session session = findSession(remoteAddress);
+    public void onMessage(AnalyzerMessage message, String rawData, SessionContext ctx) {
+        Session session = sessions.get(ctx.sessionId());
         if (session == null) {
             return;
         }
@@ -63,8 +64,8 @@ public class SessionFileListener implements AnalyzerMessageListener {
     }
 
     @Override
-    public void onRawMessage(String rawData, String remoteAddress) {
-        Session session = findSession(remoteAddress);
+    public void onRawMessage(String rawData, SessionContext ctx) {
+        Session session = sessions.get(ctx.sessionId());
         if (session == null) {
             return;
         }
@@ -81,13 +82,5 @@ public class SessionFileListener implements AnalyzerMessageListener {
         if (session != null) {
             session.close();
         }
-    }
-
-    private Session findSession(String remoteAddress) {
-        // Find session by remote address (most recent)
-        return sessions.values().stream()
-                .filter(s -> s.getRemoteAddress().equals(remoteAddress))
-                .reduce((first, second) -> second)
-                .orElse(null);
     }
 }

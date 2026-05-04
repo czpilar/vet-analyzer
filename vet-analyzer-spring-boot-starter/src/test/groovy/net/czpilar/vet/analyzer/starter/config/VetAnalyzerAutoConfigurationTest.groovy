@@ -1,6 +1,7 @@
 package net.czpilar.vet.analyzer.starter.config
 
 import net.czpilar.vet.analyzer.core.listener.AnalyzerMessageListener
+import net.czpilar.vet.analyzer.core.listener.SessionContext
 import net.czpilar.vet.analyzer.core.model.AnalyzerMessage
 import net.czpilar.vet.analyzer.core.parser.MessageParserRegistry
 import org.springframework.boot.autoconfigure.AutoConfigurations
@@ -56,6 +57,6 @@ class VetAnalyzerAutoConfigurationTest extends Specification {
 
     static class TestListener implements AnalyzerMessageListener {
         @Override
-        void onMessage(AnalyzerMessage message, String rawData, String remoteAddress) {}
+        void onMessage(AnalyzerMessage message, String rawData, SessionContext session) {}
     }
 }

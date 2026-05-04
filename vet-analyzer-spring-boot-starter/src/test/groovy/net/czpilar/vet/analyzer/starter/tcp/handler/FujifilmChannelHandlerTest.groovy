@@ -2,7 +2,7 @@ package net.czpilar.vet.analyzer.starter.tcp.handler
 
 import io.netty.channel.embedded.EmbeddedChannel
 import net.czpilar.vet.analyzer.core.listener.AnalyzerMessageListener
-import net.czpilar.vet.analyzer.core.model.AnalyzerMessage
+import net.czpilar.vet.analyzer.core.listener.SessionContext
 import net.czpilar.vet.analyzer.core.model.AnalyzerType
 import net.czpilar.vet.analyzer.core.model.fujifilm.FujifilmErrorMessage
 import net.czpilar.vet.analyzer.core.model.fujifilm.FujifilmStartMessage
@@ -18,6 +18,7 @@ class FujifilmChannelHandlerTest extends Specification {
 
     private static final String SESSION_ID = "session-1"
     private static final String REMOTE = "192.168.1.10:54321"
+    private static final SessionContext CTX = new SessionContext(SESSION_ID, REMOTE)
 
     private MessageParserRegistry registry
     private AnalyzerMessageListener listener
@@ -27,7 +28,7 @@ class FujifilmChannelHandlerTest extends Specification {
     def setup() {
         registry = Mock(MessageParserRegistry)
         listener = Mock(AnalyzerMessageListener)
-        handler = new FujifilmChannelHandler(SESSION_ID, REMOTE, registry, [listener])
+        handler = new FujifilmChannelHandler(CTX, registry, [listener])
         channel = new EmbeddedChannel(handler)
     }
 
@@ -41,7 +42,7 @@ class FujifilmChannelHandlerTest extends Specification {
 
         then:
         1 * registry.parse(msg) >> parsed
-        1 * listener.onMessage(parsed, msg, REMOTE)
+        1 * listener.onMessage(parsed, msg, CTX)
         0 * listener._
 
         cleanup:
@@ -57,7 +58,7 @@ class FujifilmChannelHandlerTest extends Specification {
 
         then:
         1 * registry.parse(msg) >> null
-        1 * listener.onRawMessage(msg, REMOTE)
+        1 * listener.onRawMessage(msg, CTX)
         0 * listener._
 
         cleanup:
@@ -74,9 +75,6 @@ class FujifilmChannelHandlerTest extends Specification {
 
     def "AU20V-specific command (T/X/Y) sets detected type and re-tags later S parsed as NX600"() {
         given:
-        // Shared S happens to be picked up by Nx600StartParser first -> tagged NX600
-        // Then specific T/X/Y arrives -> detection kicks in
-        // Then a third S still tagged NX600 -> should be re-tagged to AU20V
         def s1 = startMsg(AnalyzerType.NX600, FujifilmCommand.S)
         def specific = startMsg(AnalyzerType.AU20V, command)
         def s2 = startMsg(AnalyzerType.NX600, FujifilmCommand.S)
@@ -90,14 +88,11 @@ class FujifilmChannelHandlerTest extends Specification {
         1 * registry.parse("s1") >> s1
         1 * registry.parse("spec") >> specific
         1 * registry.parse("s2") >> s2
-        // s1 keeps original type (no detection yet)
-        1 * listener.onMessage({ it.analyzerType() == AnalyzerType.NX600 }, "s1", REMOTE)
-        // specific message keeps its own type (matches detected after update)
-        1 * listener.onMessage(specific, "spec", REMOTE)
-        // s2 gets re-tagged AU20V
+        1 * listener.onMessage({ it.analyzerType() == AnalyzerType.NX600 }, "s1", CTX)
+        1 * listener.onMessage(specific, "spec", CTX)
         1 * listener.onMessage({ it ->
             it instanceof FujifilmStartMessage && it.analyzerType() == AnalyzerType.AU20V
-        }, "s2", REMOTE)
+        }, "s2", CTX)
 
         cleanup:
         channel.finish()
@@ -118,11 +113,10 @@ class FujifilmChannelHandlerTest extends Specification {
         then:
         1 * registry.parse("spec") >> specific
         1 * registry.parse("err") >> err
-        1 * listener.onMessage(specific, "spec", REMOTE)
-        // E re-tagged from AU20V -> NX600
+        1 * listener.onMessage(specific, "spec", CTX)
         1 * listener.onMessage({ it ->
             it instanceof FujifilmErrorMessage && it.analyzerType() == AnalyzerType.NX600
-        }, "err", REMOTE)
+        }, "err", CTX)
 
         cleanup:
         channel.finish()
@@ -140,7 +134,7 @@ class FujifilmChannelHandlerTest extends Specification {
 
         then:
         1 * registry.parse("only") >> shared
-        1 * listener.onMessage({ it.analyzerType() == AnalyzerType.NX600 }, "only", REMOTE)
+        1 * listener.onMessage({ it.analyzerType() == AnalyzerType.NX600 }, "only", CTX)
 
         cleanup:
         channel.finish()
@@ -158,9 +152,8 @@ class FujifilmChannelHandlerTest extends Specification {
         then:
         1 * registry.parse("a") >> s
         1 * registry.parse("b") >> err
-        1 * listener.onMessage(s, "a", REMOTE)
-        // 'err' keeps its own AU20V type since no specific command set detectedType
-        1 * listener.onMessage({ it.analyzerType() == AnalyzerType.AU20V }, "b", REMOTE)
+        1 * listener.onMessage(s, "a", CTX)
+        1 * listener.onMessage({ it.analyzerType() == AnalyzerType.AU20V }, "b", CTX)
 
         cleanup:
         channel.finish()

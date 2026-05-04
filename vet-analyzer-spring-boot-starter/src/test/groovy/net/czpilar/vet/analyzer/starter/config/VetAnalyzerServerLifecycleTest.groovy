@@ -1,7 +1,9 @@
 package net.czpilar.vet.analyzer.starter.config
 
+import net.czpilar.vet.analyzer.core.exception.VetAnalyzerException
 import net.czpilar.vet.analyzer.core.listener.AnalyzerMessageListener
 import net.czpilar.vet.analyzer.core.parser.MessageParserRegistry
+import net.czpilar.vet.analyzer.starter.exception.VetAnalyzerServerStartException
 import spock.lang.Specification
 
 import java.net.ServerSocket
@@ -71,7 +73,7 @@ class VetAnalyzerServerLifecycleTest extends Specification {
         lifecycle.getPhase() == Integer.MAX_VALUE - 1
     }
 
-    def "start with already-bound port throws RuntimeException and lifecycle stays not running"() {
+    def "start with already-bound port throws VetAnalyzerServerStartException and lifecycle stays not running"() {
         given:
         // Pre-bind the port to provoke a bind failure
         def hog = new ServerSocket(properties.port)
@@ -80,7 +82,10 @@ class VetAnalyzerServerLifecycleTest extends Specification {
         lifecycle.start()
 
         then:
-        thrown(RuntimeException)
+        // VetAnalyzerServerStartException extends VetAnalyzerException for catch-all use
+        VetAnalyzerServerStartException ex = thrown()
+        ex instanceof VetAnalyzerException
+        ex.cause != null
         !lifecycle.isRunning()
 
         cleanup:

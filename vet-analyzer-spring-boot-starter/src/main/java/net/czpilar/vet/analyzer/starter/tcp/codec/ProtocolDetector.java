@@ -6,6 +6,7 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.timeout.IdleStateHandler;
 import net.czpilar.vet.analyzer.core.listener.AnalyzerMessageListener;
+import net.czpilar.vet.analyzer.core.listener.SessionContext;
 import net.czpilar.vet.analyzer.core.parser.MessageParserRegistry;
 import net.czpilar.vet.analyzer.core.protocol.ControlCharacters;
 import net.czpilar.vet.analyzer.core.protocol.hl7.Hl7Protocol;
@@ -34,6 +35,7 @@ public class ProtocolDetector extends ByteToMessageDecoder {
 
     private String sessionId;
     private String remoteAddress;
+    private SessionContext sessionContext;
 
     public ProtocolDetector(MessageParserRegistry parserRegistry,
                             List<AnalyzerMessageListener> listeners,
@@ -47,10 +49,11 @@ public class ProtocolDetector extends ByteToMessageDecoder {
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         this.sessionId = generateSessionId();
         this.remoteAddress = ((InetSocketAddress) ctx.channel().remoteAddress()).getAddress().getHostAddress();
+        this.sessionContext = new SessionContext(sessionId, remoteAddress);
 
         log.info("Client connected: {} (session {})", remoteAddress, sessionId);
         for (AnalyzerMessageListener listener : listeners) {
-            listener.onSessionStart(sessionId, remoteAddress);
+            listener.onSessionStart(sessionContext);
         }
 
         // Idle timeout - close connection if no data received (even if no protocol detected yet)
@@ -89,15 +92,15 @@ public class ProtocolDetector extends ByteToMessageDecoder {
             log.info("Detected HL7/MLLP protocol from {}", remoteAddress);
             pipeline.addLast("mllpDecoder", new MllpDecoder());
             pipeline.addLast("mllpEncoder", new MllpEncoder());
-            pipeline.addLast("handler", new Hl7ChannelHandler(sessionId, remoteAddress, parserRegistry, listeners));
+            pipeline.addLast("handler", new Hl7ChannelHandler(sessionContext, parserRegistry, listeners));
         } else if (isFujifilm(peek)) {
             log.info("Detected Fujifilm protocol from {}", remoteAddress);
             pipeline.addLast("stxEtxDecoder", new StxEtxDecoder());
-            pipeline.addLast("handler", new FujifilmChannelHandler(sessionId, remoteAddress, parserRegistry, listeners));
+            pipeline.addLast("handler", new FujifilmChannelHandler(sessionContext, parserRegistry, listeners));
         } else {
             log.warn("Unknown protocol from {}, logging raw data", remoteAddress);
             pipeline.addLast("rawDecoder", new RawDecoder());
-            pipeline.addLast("handler", new RawChannelHandler(sessionId, remoteAddress, listeners));
+            pipeline.addLast("handler", new RawChannelHandler(sessionContext, listeners));
         }
 
         pipeline.remove(this);

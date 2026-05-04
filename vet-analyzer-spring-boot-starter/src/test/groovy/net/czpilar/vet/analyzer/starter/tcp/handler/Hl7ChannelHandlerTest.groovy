@@ -2,6 +2,7 @@ package net.czpilar.vet.analyzer.starter.tcp.handler
 
 import io.netty.channel.embedded.EmbeddedChannel
 import net.czpilar.vet.analyzer.core.listener.AnalyzerMessageListener
+import net.czpilar.vet.analyzer.core.listener.SessionContext
 import net.czpilar.vet.analyzer.core.model.hl7.Hl7Message
 import net.czpilar.vet.analyzer.core.parser.MessageParserRegistry
 import spock.lang.Specification
@@ -13,6 +14,7 @@ class Hl7ChannelHandlerTest extends Specification {
 
     private static final String SESSION_ID = "session-1"
     private static final String REMOTE = "192.168.1.10:54321"
+    private static final SessionContext CTX = new SessionContext(SESSION_ID, REMOTE)
 
     private MessageParserRegistry registry
     private AnalyzerMessageListener listener
@@ -22,7 +24,7 @@ class Hl7ChannelHandlerTest extends Specification {
     def setup() {
         registry = Mock(MessageParserRegistry)
         listener = Mock(AnalyzerMessageListener)
-        handler = new Hl7ChannelHandler(SESSION_ID, REMOTE, registry, [listener])
+        handler = new Hl7ChannelHandler(CTX, registry, [listener])
         channel = new EmbeddedChannel(handler)
     }
 
@@ -36,11 +38,10 @@ class Hl7ChannelHandlerTest extends Specification {
 
         then:
         1 * registry.parse(msg) >> parsed
-        1 * listener.onMessage(parsed, msg, REMOTE)
+        1 * listener.onMessage(parsed, msg, CTX)
         0 * listener._
 
         and:
-        // Outbound ACK should reference the message control id
         def ack = channel.readOutbound() as String
         ack != null
         ack.contains("MSGCTL-123")
@@ -58,7 +59,7 @@ class Hl7ChannelHandlerTest extends Specification {
 
         then:
         1 * registry.parse(msg) >> null
-        1 * listener.onRawMessage(msg, REMOTE)
+        1 * listener.onRawMessage(msg, CTX)
         0 * listener._
 
         and:

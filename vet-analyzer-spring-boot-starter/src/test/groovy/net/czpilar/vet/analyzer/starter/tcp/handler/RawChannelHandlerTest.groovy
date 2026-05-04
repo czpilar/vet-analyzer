@@ -2,12 +2,14 @@ package net.czpilar.vet.analyzer.starter.tcp.handler
 
 import io.netty.channel.embedded.EmbeddedChannel
 import net.czpilar.vet.analyzer.core.listener.AnalyzerMessageListener
+import net.czpilar.vet.analyzer.core.listener.SessionContext
 import spock.lang.Specification
 
 class RawChannelHandlerTest extends Specification {
 
     private static final String SESSION_ID = "raw-session"
     private static final String REMOTE = "10.0.0.5:1234"
+    private static final SessionContext CTX = new SessionContext(SESSION_ID, REMOTE)
 
     private AnalyzerMessageListener listener
     private RawChannelHandler handler
@@ -15,7 +17,7 @@ class RawChannelHandlerTest extends Specification {
 
     def setup() {
         listener = Mock(AnalyzerMessageListener)
-        handler = new RawChannelHandler(SESSION_ID, REMOTE, [listener])
+        handler = new RawChannelHandler(CTX, [listener])
         channel = new EmbeddedChannel(handler)
     }
 
@@ -24,7 +26,7 @@ class RawChannelHandlerTest extends Specification {
         channel.writeInbound("anything")
 
         then:
-        1 * listener.onRawMessage("anything", REMOTE)
+        1 * listener.onRawMessage("anything", CTX)
         0 * listener._
 
         cleanup:
@@ -42,15 +44,15 @@ class RawChannelHandlerTest extends Specification {
     def "all listeners receive raw message"() {
         given:
         def listener2 = Mock(AnalyzerMessageListener)
-        def multiHandler = new RawChannelHandler(SESSION_ID, REMOTE, [listener, listener2])
+        def multiHandler = new RawChannelHandler(CTX, [listener, listener2])
         def multiChannel = new EmbeddedChannel(multiHandler)
 
         when:
         multiChannel.writeInbound("msg")
 
         then:
-        1 * listener.onRawMessage("msg", REMOTE)
-        1 * listener2.onRawMessage("msg", REMOTE)
+        1 * listener.onRawMessage("msg", CTX)
+        1 * listener2.onRawMessage("msg", CTX)
 
         cleanup:
         multiChannel.finish()

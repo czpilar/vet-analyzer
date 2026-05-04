@@ -1,5 +1,7 @@
 package net.czpilar.vet.analyzer.core.protocol.fujifilm
 
+import net.czpilar.vet.analyzer.core.exception.UnknownFujifilmCommandException
+import net.czpilar.vet.analyzer.core.exception.VetAnalyzerException
 import spock.lang.Specification
 
 class FujifilmCommandTest extends Specification {
@@ -20,12 +22,14 @@ class FujifilmCommandTest extends Specification {
         "Y"  || FujifilmCommand.Y
     }
 
-    def "fromCode throws for invalid code '#code'"() {
+    def "fromCode throws UnknownFujifilmCommandException for invalid code '#code'"() {
         when:
         FujifilmCommand.fromCode(code)
 
         then:
-        thrown(IllegalArgumentException)
+        UnknownFujifilmCommandException ex = thrown()
+        // Catch-all via VetAnalyzerException base also matches
+        ex instanceof VetAnalyzerException
 
         where:
         code << ["Z", "ABC", "", null]

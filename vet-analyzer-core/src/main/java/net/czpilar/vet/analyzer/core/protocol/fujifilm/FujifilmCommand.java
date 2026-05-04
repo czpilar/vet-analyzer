@@ -1,5 +1,7 @@
 package net.czpilar.vet.analyzer.core.protocol.fujifilm;
 
+import net.czpilar.vet.analyzer.core.exception.UnknownFujifilmCommandException;
+
 public enum FujifilmCommand {
 
     I("Worklist index query", true),
@@ -29,12 +31,12 @@ public enum FujifilmCommand {
 
     public static FujifilmCommand fromCode(String code) {
         if (code == null || code.isEmpty()) {
-            throw new IllegalArgumentException("Command code must not be null or empty");
+            throw new UnknownFujifilmCommandException("Command code must not be null or empty");
         }
         try {
             return valueOf(code.trim().toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Unknown Fujifilm command code: " + code);
+            throw new UnknownFujifilmCommandException("Unknown Fujifilm command code: " + code);
         }
     }
 
