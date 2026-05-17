@@ -91,6 +91,7 @@ class SessionTest extends Specification {
         given:
         def session = new Session("s1", "10.0.0.1", tempDir)
         def hl7 = new Hl7Message(
+                AnalyzerType.BM850_EXIGO,
                 "MSGCTL-1", "ORU^R01", "2.7", "BM850",
                 LocalDateTime.of(2026, 5, 3, 10, 0),
                 "SAMPLE-42", "USI",

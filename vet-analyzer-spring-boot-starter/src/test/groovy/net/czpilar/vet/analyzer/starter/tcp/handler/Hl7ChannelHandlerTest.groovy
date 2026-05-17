@@ -3,6 +3,7 @@ package net.czpilar.vet.analyzer.starter.tcp.handler
 import io.netty.channel.embedded.EmbeddedChannel
 import net.czpilar.vet.analyzer.core.listener.AnalyzerMessageListener
 import net.czpilar.vet.analyzer.core.listener.SessionContext
+import net.czpilar.vet.analyzer.core.model.AnalyzerType
 import net.czpilar.vet.analyzer.core.model.hl7.Hl7Message
 import net.czpilar.vet.analyzer.core.parser.MessageParserRegistry
 import spock.lang.Specification
@@ -78,7 +79,7 @@ class Hl7ChannelHandlerTest extends Specification {
     }
 
     private static Hl7Message hl7Message(String controlId) {
-        return new Hl7Message(controlId, "ORU^R01", "2.7", "BM850",
+        return new Hl7Message(AnalyzerType.BM850_EXIGO, controlId, "ORU^R01", "2.7", "BM850",
                 LocalDateTime.of(2026, 5, 3, 10, 0), "S1", "USI", LocalDateTime.of(2026, 5, 3, 10, 0),
                 "comment", [], "raw", Instant.parse("2026-05-03T10:00:00Z"))
     }

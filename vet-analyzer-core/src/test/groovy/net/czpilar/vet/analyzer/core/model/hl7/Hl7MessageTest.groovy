@@ -8,9 +8,9 @@ import java.time.LocalDateTime
 
 class Hl7MessageTest extends Specification {
 
-    def "analyzerType is always BM850_EXIGO"() {
+    def "analyzerType is taken from constructor"() {
         given:
-        def msg = new Hl7Message("ID", "ORU^R01", "2.7", "BM850",
+        def msg = new Hl7Message(AnalyzerType.BM850_EXIGO, "ID", "ORU^R01", "2.7", "BM850",
                 LocalDateTime.now(), "S1", "USI",
                 LocalDateTime.now(), "comment", [], "raw", Instant.now())
 
@@ -20,7 +20,7 @@ class Hl7MessageTest extends Specification {
 
     def "messageDescription combines messageType and HL7 version"() {
         given:
-        def msg = new Hl7Message("ID", "ORU^R01", "2.7", "BM850",
+        def msg = new Hl7Message(AnalyzerType.BM850_EXIGO, "ID", "ORU^R01", "2.7", "BM850",
                 LocalDateTime.now(), "S1", "USI",
                 LocalDateTime.now(), "comment", [], "raw", Instant.now())
 
@@ -35,10 +35,11 @@ class Hl7MessageTest extends Specification {
         def obs = new Hl7Observation(1, "NM", "HGB", "14.1", "g/dL", "12-16", "N", "F")
 
         when:
-        def msg = new Hl7Message("MSGCTL-1", "ORU^R01", "2.7", "BM850", now,
+        def msg = new Hl7Message(AnalyzerType.BM850_EXIGO, "MSGCTL-1", "ORU^R01", "2.7", "BM850", now,
                 "SAMPLE-42", "USI", now, "test comment", [obs], "raw-data", received)
 
         then:
+        msg.analyzerType() == AnalyzerType.BM850_EXIGO
         msg.messageControlId() == "MSGCTL-1"
         msg.messageType() == "ORU^R01"
         msg.hl7Version() == "2.7"

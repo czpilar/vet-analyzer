@@ -1,12 +1,12 @@
 package net.czpilar.vet.analyzer.core.parser;
 
 import net.czpilar.vet.analyzer.core.model.AnalyzerMessage;
+import net.czpilar.vet.analyzer.core.parser.boule.bm850.Bm850MessageParser;
 import net.czpilar.vet.analyzer.core.parser.fujifilm.au20v.Au20vErrorParser;
 import net.czpilar.vet.analyzer.core.parser.fujifilm.au20v.Au20vResultParser;
 import net.czpilar.vet.analyzer.core.parser.fujifilm.au20v.Au20vStartParser;
 import net.czpilar.vet.analyzer.core.parser.fujifilm.au20v.Au20vWorklistParser;
 import net.czpilar.vet.analyzer.core.parser.fujifilm.nx600.*;
-import net.czpilar.vet.analyzer.core.parser.hl7.Hl7MessageParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +37,7 @@ public class MessageParserRegistry {
     /**
      * Creates a registry with all default parsers.
      * AU20V-specific parsers are checked first (T, X, Y commands),
-     * then NX600 parsers (R, I, W, S, E), then HL7.
+     * then NX600 parsers (R, I, W, S, E), then device-specific HL7 parsers.
      */
     public static MessageParserRegistry createDefault() {
         List<MessageParser<?>> parsers = new ArrayList<>();
@@ -55,8 +55,8 @@ public class MessageParserRegistry {
         parsers.add(new Nx600StartParser());
         parsers.add(new Nx600ErrorParser());
 
-        // HL7 parser last
-        parsers.add(new Hl7MessageParser());
+        // HL7-based device parsers (strict per device + protocol version)
+        parsers.add(new Bm850MessageParser());
 
         return new MessageParserRegistry(parsers);
     }

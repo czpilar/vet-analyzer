@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public record Hl7Message(
+        AnalyzerType analyzerType,
         String messageControlId,
         String messageType,
         String hl7Version,
@@ -21,11 +22,6 @@ public record Hl7Message(
         String rawData,
         Instant receivedAt
 ) implements AnalyzerMessage {
-
-    @Override
-    public AnalyzerType analyzerType() {
-        return AnalyzerType.BM850_EXIGO;
-    }
 
     @Override
     public String messageDescription() {
