@@ -16,7 +16,7 @@ Communication server for veterinary laboratory analyzers.
 |------------------------------------|---------------------------------------------------------------------------------------------------|
 | `vet-analyzer-core`                | Core library - protocol handling, message models, parsers, listener API. No Spring dependency.    |
 | `vet-analyzer-spring-boot-starter` | Spring Boot Starter - auto-configures TCP server with Netty. Embeddable into any Spring Boot app. |
-| `vet-analyzer-server`              | Standalone Spring Boot server - uses starter + file-based session logging.                        |
+| `vet-analyzer-server`              | Standalone Spring Boot server - uses starter, persists session text logs and JSON sidecars, exposes REST API + web UI for browsing sessions. |
 | `vet-analyzer-test-client`         | Spring Shell interactive client simulating all 3 analyzer types + raw/unknown device.             |
 | `vet-analyzer-app`                 | Distribution package - produces ZIP with scripts, JARs, and configuration.                        |
 
@@ -88,7 +88,9 @@ Server listens on a single TCP port (default 9012) and auto-detects the analyzer
 - **AU20V** - detected by STX framing + command `T`, `X`, `Y`
 - **Unknown** - any other protocol is logged as raw data
 
-Each TCP connection creates a session log file in the `sessions/` directory containing raw messages with parsed annotations.
+Each TCP connection creates two files in the `sessions/` directory:
+- `session_<id>_<remote>.log` - human-readable text log with raw messages and parsed annotations
+- `session_<id>_<remote>.json` - structured JSON sidecar (summary + parsed message records) consumed by the web UI
 
 ### Configuration
 
@@ -106,15 +108,25 @@ vet:
       directory: ./sessions
 ```
 
+### Web UI
+
+The standalone server serves a simple web UI at `http://localhost:8090/` (vanilla HTML/JS, no build step) for:
+- monitoring TCP server status and controlling its lifecycle (start / stop / restart)
+- browsing sessions (newest first, auto-polled every 3 s)
+- inspecting per-session messages with raw payload and parsed structured data
+
 ### REST API
 
-The standalone server includes a REST API for managing the TCP analyzer server:
+The standalone server includes a REST API used by the web UI:
 
-| Method | URL                    | Description                    |
-|--------|------------------------|--------------------------------|
-| GET    | `/api/analyzer/status` | Returns `{"running": true}`    |
-| POST   | `/api/analyzer/start`  | Starts the TCP analyzer server |
-| POST   | `/api/analyzer/stop`   | Stops the TCP analyzer server  |
+| Method | URL                     | Description                                                       |
+|--------|-------------------------|-------------------------------------------------------------------|
+| GET    | `/api/analyzer/status`  | Returns `{"running": true, "message": null}`                      |
+| POST   | `/api/analyzer/start`   | Starts the TCP analyzer server                                    |
+| POST   | `/api/analyzer/stop`    | Stops the TCP analyzer server                                     |
+| POST   | `/api/analyzer/restart` | Restarts the TCP analyzer server (stop + start)                   |
+| GET    | `/api/sessions`         | List session summaries (newest first), read from JSON sidecars    |
+| GET    | `/api/sessions/{id}`    | Full session detail (summary + messages with raw + parsed fields) |
 
 Example:
 
@@ -122,6 +134,9 @@ Example:
 curl http://localhost:8090/api/analyzer/status
 curl -X POST http://localhost:8090/api/analyzer/start
 curl -X POST http://localhost:8090/api/analyzer/stop
+curl -X POST http://localhost:8090/api/analyzer/restart
+curl http://localhost:8090/api/sessions
+curl http://localhost:8090/api/sessions/session_20260525-000252-9e8f_127-0-0-1
 ```
 
 ## Test Client Commands
@@ -176,7 +191,11 @@ Interactive shell with prompt `vet:analyzer>`.
 
 All connect commands accept optional `--host` (default `localhost`) and `--port` (default `9012`) parameters.
 
-## Session Log Format
+## Session File Formats
+
+Each TCP session is persisted as two files in `sessions/` - a text log for humans / debugging and a JSON sidecar consumed by the web UI.
+
+### Text log (`.log`)
 
 ```
 === SESSION START ===
@@ -198,6 +217,37 @@ Tests: TP-PS=74 g/l [55-75], ALP-PS=4.51 ukat/l [0.10-4.00] H, ...
 ```
 
 For unknown devices, messages are logged as `UNKNOWN` type without parsed section.
+
+### JSON sidecar (`.json`)
+
+Rewritten on every event so the UI can poll mid-session. The `parsed` field is the actual `AnalyzerMessage` record (`Hl7Message`, `FujifilmResultMessage`, ...) serialized as-is, so all per-type fields are preserved.
+
+```json
+{
+  "summary": {
+    "id": "session_20260525-000252-9e8f_127-0-0-1",
+    "sessionId": "20260525-000252-9e8f",
+    "remote": "127.0.0.1",
+    "startedAt": "2026-05-25 00:02:52",
+    "endedAt": "2026-05-25 00:02:54",
+    "analyzer": "Fujifilm NX600 (Biochemistry)",
+    "messageCount": 1
+  },
+  "messages": [
+    {
+      "type": "R - Measurement results",
+      "timestamp": "2026-05-25 00:02:53",
+      "raw": "R,NORMAL ,14-06-2019,09:28,8...",
+      "parsed": {
+        "analyzerType": "NX600",
+        "command": "R",
+        "sampleNumber": "8",
+        "testResults": [ { "testCode": "TP-PS", "value": "74", "unit": "g/l" } ]
+      }
+    }
+  ]
+}
+```
 
 ## Embedding in Existing Spring Boot Application
 
