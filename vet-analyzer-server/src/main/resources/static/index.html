@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Vet Analyzer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+    <div class="brand">
+        <span class="logo"></span>
+        <span>Vet Analyzer</span>
+    </div>
+    <div class="server-controls">
+        <span class="status">
+            <span id="status-dot" class="dot dot-unknown"></span>
+            <span id="status-text">checking...</span>
+        </span>
+        <button id="btn-start">Start</button>
+        <button id="btn-stop">Stop</button>
+        <button id="btn-restart">Restart</button>
+    </div>
+</header>
+
+<main>
+    <aside id="sessions-panel">
+        <div class="panel-header">
+            <h2>Sessions</h2>
+            <button id="btn-refresh" title="Refresh">&#x21bb;</button>
+        </div>
+        <ul id="sessions-list"></ul>
+    </aside>
+
+    <section id="detail-panel">
+        <div id="detail-placeholder" class="placeholder">Select a session</div>
+        <div id="detail-content" hidden>
+            <div id="detail-summary"></div>
+            <div id="detail-messages"></div>
+        </div>
+    </section>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>

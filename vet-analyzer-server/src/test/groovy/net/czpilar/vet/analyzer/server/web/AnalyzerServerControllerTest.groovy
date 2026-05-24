@@ -1,5 +1,6 @@
 package net.czpilar.vet.analyzer.server.web
 
+import net.czpilar.vet.analyzer.server.dto.AnalyzerServerStatus
 import net.czpilar.vet.analyzer.starter.config.VetAnalyzerServerLifecycle
 import spock.lang.Specification
 
@@ -13,7 +14,7 @@ class AnalyzerServerControllerTest extends Specification {
         def result = controller.status()
 
         then:
-        result == [running: running]
+        result == new AnalyzerServerStatus(running, null)
         1 * lifecycle.isRunning() >> running
 
         where:
@@ -25,7 +26,7 @@ class AnalyzerServerControllerTest extends Specification {
         def result = controller.start()
 
         then:
-        result == [running: true, message: "Started"]
+        result == new AnalyzerServerStatus(true, "Started")
         1 * lifecycle.isRunning() >> false
         1 * lifecycle.start()
         0 * lifecycle._
@@ -36,7 +37,7 @@ class AnalyzerServerControllerTest extends Specification {
         def result = controller.start()
 
         then:
-        result == [running: true, message: "Already running"]
+        result == new AnalyzerServerStatus(true, "Already running")
         1 * lifecycle.isRunning() >> true
         0 * lifecycle.start()
         0 * lifecycle._
@@ -47,7 +48,7 @@ class AnalyzerServerControllerTest extends Specification {
         def result = controller.stop()
 
         then:
-        result == [running: false, message: "Stopped"]
+        result == new AnalyzerServerStatus(false, "Stopped")
         1 * lifecycle.isRunning() >> true
         1 * lifecycle.stop()
         0 * lifecycle._
@@ -58,9 +59,34 @@ class AnalyzerServerControllerTest extends Specification {
         def result = controller.stop()
 
         then:
-        result == [running: false, message: "Already stopped"]
+        result == new AnalyzerServerStatus(false, "Already stopped")
         1 * lifecycle.isRunning() >> false
         0 * lifecycle.stop()
+        0 * lifecycle._
+    }
+
+    def "restart stops then starts when running"() {
+        when:
+        def result = controller.restart()
+
+        then:
+        result == new AnalyzerServerStatus(true, "Restarted")
+        1 * lifecycle.isRunning() >> true
+        then:
+        1 * lifecycle.stop()
+        then:
+        1 * lifecycle.start()
+        0 * lifecycle._
+    }
+
+    def "restart only starts when not running"() {
+        when:
+        def result = controller.restart()
+
+        then:
+        result == new AnalyzerServerStatus(true, "Restarted")
+        1 * lifecycle.isRunning() >> false
+        1 * lifecycle.start()
         0 * lifecycle._
     }
 }
