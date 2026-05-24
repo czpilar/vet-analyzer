@@ -144,11 +144,68 @@ function renderDetail(detail) {
             ${m.parsed ? `
             <div class="message-section">
                 <h4>Parsed</h4>
-                <pre>${escapeHtml(JSON.stringify(m.parsed, null, 2))}</pre>
+                ${renderParsed(m.parsed)}
             </div>` : ""}
         `;
         msgsHost.appendChild(card);
     }
+}
+
+const PARSED_SKIP = new Set(["analyzerType", "rawData", "receivedAt"]);
+
+function renderParsed(parsed) {
+    const scalars = [];
+    const tables = [];
+
+    for (const [key, value] of Object.entries(parsed)) {
+        if (PARSED_SKIP.has(key)) {
+            continue;
+        }
+        if (Array.isArray(value) && value.length > 0 && typeof value[0] === "object" && value[0] !== null) {
+            tables.push({ key, rows: value });
+        } else {
+            scalars.push({ key, value });
+        }
+    }
+
+    let html = "";
+    if (scalars.length > 0) {
+        html += `<div class="parsed-grid">`;
+        for (const { key, value } of scalars) {
+            html += `<div class="key">${escapeHtml(key)}</div><div class="val">${formatScalar(value)}</div>`;
+        }
+        html += `</div>`;
+    }
+    for (const { key, rows } of tables) {
+        html += renderTable(key, rows);
+    }
+    return html;
+}
+
+function renderTable(name, rows) {
+    const columns = [...new Set(rows.flatMap((r) => Object.keys(r)))];
+    let html = `<div class="parsed-table-name">${escapeHtml(name)}</div>`;
+    html += `<table class="parsed-table"><thead><tr>`;
+    for (const col of columns) {
+        html += `<th>${escapeHtml(col)}</th>`;
+    }
+    html += `</tr></thead><tbody>`;
+    for (const row of rows) {
+        html += `<tr>`;
+        for (const col of columns) {
+            html += `<td>${formatScalar(row[col])}</td>`;
+        }
+        html += `</tr>`;
+    }
+    html += `</tbody></table>`;
+    return html;
+}
+
+function formatScalar(value) {
+    if (value == null || value === "") {
+        return `<span class="empty">—</span>`;
+    }
+    return escapeHtml(value);
 }
 
 function renderDetailError(msg) {

@@ -330,3 +330,69 @@ main {
     max-height: 260px;
     overflow-y: auto;
 }
+
+.parsed-grid {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 4px 16px;
+    padding: 4px 0;
+}
+
+.parsed-grid .key {
+    color: #6b7280;
+    font-size: 12px;
+    font-variant: small-caps;
+    letter-spacing: 0.4px;
+}
+
+.parsed-grid .val {
+    color: #111827;
+    font-size: 13px;
+    font-family: "SF Mono", "Consolas", "Liberation Mono", monospace;
+}
+
+.parsed-table-name {
+    margin: 12px 0 4px;
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #6b7280;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.parsed-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    font-family: "SF Mono", "Consolas", "Liberation Mono", monospace;
+}
+
+.parsed-table th,
+.parsed-table td {
+    text-align: left;
+    padding: 6px 10px;
+    border-bottom: 1px solid #f3f4f6;
+    white-space: nowrap;
+}
+
+.parsed-table th {
+    background: #fafafa;
+    color: #6b7280;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.parsed-table tr:last-child td {
+    border-bottom: none;
+}
+
+.parsed-table tr:hover td {
+    background: #f9fafb;
+}
+
+.empty {
+    color: #d1d5db;
+}
