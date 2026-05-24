@@ -39,16 +39,17 @@ public class Hl7Commands extends AbstractDeviceCommands {
 
     @Command(name = "hl7 send results", description = "Send hematology results")
     public String hl7SendResults(
-            @Option(longName = "sampleId", defaultValue = "68") String sampleId) {
+            @Option(longName = "sampleId", defaultValue = "46") String sampleId,
+            @Option(longName = "name", defaultValue = "terezka") String name) {
         return whenConnected(() -> {
-            getSimulator().sendMessage(dataGenerator.generateResultMessage(sampleId));
+            getSimulator().sendMessage(dataGenerator.generateResultMessage(sampleId, name));
             String ack;
             try {
                 ack = getSimulator().receiveResponse();
             } catch (Exception e) {
                 ack = null;
             }
-            return "Sent HL7 results for sample " + sampleId + ". ACK: " + (ack != null ? "received" : "not received");
+            return "Sent HL7 results for sample " + sampleId + " (" + name + "). ACK: " + (ack != null ? "received" : "not received");
         });
     }
 
@@ -59,8 +60,8 @@ public class Hl7Commands extends AbstractDeviceCommands {
             @Option(longName = "port", defaultValue = "9012") Integer port) {
         PrintWriter out = ctx.outputWriter();
         CommandUtils.printAndDelay(out, hl7Connect(host, port));
-        CommandUtils.printAndDelay(out, hl7SendResults("68"));
-        CommandUtils.printAndDelay(out, hl7SendResults("69"));
+        CommandUtils.printAndDelay(out, hl7SendResults("46", "terezka"));
+        CommandUtils.printAndDelay(out, hl7SendResults("47", "anicka"));
         return hl7Disconnect();
     }
 

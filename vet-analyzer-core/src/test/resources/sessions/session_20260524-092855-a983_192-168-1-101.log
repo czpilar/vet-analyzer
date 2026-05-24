@@ -1,0 +1,16 @@
+=== SESSION START ===
+Session ID: 20260524-092855-a983
+Remote: 192.168.1.101
+Started: 2026-05-24 09:28:55
+
+Analyzer: BM850/EXIGO H400 (Hematology) [auto-detected]
+
+--- MESSAGE [ORU^R01 (HL7 2.7)] @ 2026-05-24 09:28:55 ---
+MSH|^~\&|BM850^HL7MW|||||20260524092826|ORU^R01|BM_1|P|2.7||||||UNICODE UTF-8SFT|Boule Medical AB|r28391 branches/rel-2.3.11|E|r28391 branches/rel-2.3.11OBR|1||46|terezka||||||||||||||||||202605212037NTE|1||""OBX|1|ST|ID2||""||||||POBX|2|ST|PROF||PES (3POP)||||||POBX|3|ST|METH||OT||||||POBX|4|ST|OPID||""||||||POBX|5|NM|RBC||5.04|10*12/L|5.50-8.50|""|||POBX|6|NM|MCV||68.5|fL|60.0-72.0|""|||POBX|7|NM|HCT||34.5|%|37.0-55.0|""|||POBX|8|NM|MCH||24.6|pg|19.5-25.5|""|||POBX|9|NM|MCHC||35.9|g/dL|32.0-38.5|""|||POBX|10|NM|RDWR||15.2|%|12.0-17.5|""|||POBX|11|NM|RDWA||46.7|fL|35.0-65.0|""|||POBX|12|NM|PLT||375|10*9/L|200-500|""|||POBX|13|NM|MPV||7.7|fL|5.5-10.5|""|||POBX|14|NM|HGB||12.4|g/dL|12.0-18.0|""|||POBX|15|NM|WBC||12.9|10*9/L|6.0-17.0|""|||POBX|16|NM|LYMA||1.1|10*9/L|0.9-5.0|""|||POBX|17|NM|MONA||0.6|10*9/L|0.3-1.5|""|||POBX|18|NM|GRNA||11.2|10*9/L|3.5-12.0|""|||POBX|19|NM|LYMR||8.7|%|0.0-99.9|""|||POBX|20|NM|MONR||4.9|%|0.0-99.9|""|||POBX|21|NM|GRNR||86.4|%|0.0-99.9|""|||POBX|22|NM|EOSA||""|10*9/L|0.1-1.5|""|||POBX|23|NM|EOSR||""|%|0.1-99.9|""|||P
+--- PARSED ---
+Type: ORU^R01 (HL7 2.7)
+Sample: 46
+Tests: RBC=5.04 10*12/L, MCV=68.5 fL, HCT=34.5 %, MCH=24.6 pg, MCHC=35.9 g/dL, RDWR=15.2 %, RDWA=46.7 fL, PLT=375 10*9/L, MPV=7.7 fL, HGB=12.4 g/dL, WBC=12.9 10*9/L, LYMA=1.1 10*9/L, MONA=0.6 10*9/L, GRNA=11.2 10*9/L, LYMR=8.7 %, MONR=4.9 %, GRNR=86.4 %, EOSA= 10*9/L, EOSR= %
+--- END MESSAGE ---
+
+=== SESSION END === 2026-05-24 09:33:55

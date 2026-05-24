@@ -1,0 +1,16 @@
+=== SESSION START ===
+Session ID: 20260524-092800-a9ca
+Remote: 192.168.1.52
+Started: 2026-05-24 09:28:00
+
+Analyzer: Fujifilm NX600 (Biochemistry) [auto-detected]
+
+--- MESSAGE [R - Measurement results] @ 2026-05-24 09:28:00 ---
+R,NORMAL ,20-05-2026,13:08,3            ,JENY         ,             ,14,9,999,01,15,TP-PS   ,=,62       g/l   ,01,55   ,75   ,           ,ALB-PS  ,=,36       g/l   ,01,26   ,40   ,           ,ALP-PS  ,=,0.67     ukat/l,01,0.10 ,4.00 ,           ,GLU-PS  ,=,5.7      mmol/l,01,3.1  ,6.7  ,           ,TBIL-PS ,=,5        umol/l,01,0    ,7    ,           ,IP-PS   ,=,1.82     mmol/l,01,1.00 ,2.10 ,           ,TCHO-PS ,=,7.81     mmol/l,01,3.50 ,7.80 ,H          ,GGT-PS  ,<,0.17     ukat/l,01,0.08 ,0.23 ,           ,GPT-PS  ,=,0.32     ukat/l,01,0.10 ,1.00 ,           ,Ca-PS   ,=,2.91     mmol/l,01,2.30 ,3.00 ,           ,CRE-PS  ,=,70       umol/l,01,35   ,110  ,           ,BUN-PS  ,=,7.36     mmol/l,01,3.30 ,8.30 ,           ,GLOB    ,=,26       g/l   ,01,16   ,37   ,           ,ALB/GLB ,=,1.4            ,01,0.7  ,1.9  ,           ,BUN/CRE ,=,105.1    (SI)  ,01,50.4 ,128.1,           
+--- PARSED ---
+Type: R (Measurement results)
+Sample: 3, Patient: JENY, Species: 14
+Tests: TP-PS=62 g/l [55-75], ALB-PS=36 g/l [26-40], ALP-PS=0.67 ukat/l [0.10-4.00], GLU-PS=5.7 mmol/l [3.1-6.7], TBIL-PS=5 umol/l [0-7], IP-PS=1.82 mmol/l [1.00-2.10], TCHO-PS=7.81 mmol/l [3.50-7.80] H, GGT-PS<0.17 ukat/l [0.08-0.23], GPT-PS=0.32 ukat/l [0.10-1.00], Ca-PS=2.91 mmol/l [2.30-3.00], CRE-PS=70 umol/l [35-110], BUN-PS=7.36 mmol/l [3.30-8.30], GLOB=26 g/l [16-37], ALB/GLB=1.4  [0.7-1.9], BUN/CRE=105.1 (SI) [50.4-128.1]
+--- END MESSAGE ---
+
+=== SESSION END === 2026-05-24 09:28:00

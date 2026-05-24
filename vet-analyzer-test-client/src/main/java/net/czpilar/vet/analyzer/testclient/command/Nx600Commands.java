@@ -39,25 +39,27 @@ public class Nx600Commands extends AbstractDeviceCommands {
 
     @Command(name = "nx600 send results", description = "Send biochemistry results")
     public String nx600SendResults(
-            @Option(longName = "sampleNumber", defaultValue = "1") String sampleNumber) {
+            @Option(longName = "sampleNumber", defaultValue = "3") String sampleNumber,
+            @Option(longName = "patientId", defaultValue = "JENY") String patientId) {
         return whenConnected(() -> {
-            getSimulator().sendMessage(dataGenerator.generateResultMessage(sampleNumber));
-            return "Sent NX600 results for sample " + sampleNumber;
+            getSimulator().sendMessage(dataGenerator.generateResultMessage(sampleNumber, patientId));
+            return "Sent NX600 results for sample " + sampleNumber + " (" + patientId + ")";
         });
     }
 
     @Command(name = "nx600 send start", description = "Send test start notification")
     public String nx600SendStart(
-            @Option(longName = "sampleNumber", defaultValue = "1") String sampleNumber) {
+            @Option(longName = "sampleNumber", defaultValue = "3") String sampleNumber,
+            @Option(longName = "patientId", defaultValue = "JENY") String patientId) {
         return whenConnected(() -> {
-            getSimulator().sendMessage(dataGenerator.generateStartMessage(sampleNumber));
-            return "Sent NX600 start for sample " + sampleNumber;
+            getSimulator().sendMessage(dataGenerator.generateStartMessage(sampleNumber, patientId));
+            return "Sent NX600 start for sample " + sampleNumber + " (" + patientId + ")";
         });
     }
 
     @Command(name = "nx600 send sample info", description = "Send sample info query")
     public String nx600SendSampleInfo(
-            @Option(longName = "sampleNumber", defaultValue = "1") String sampleNumber) {
+            @Option(longName = "sampleNumber", defaultValue = "3") String sampleNumber) {
         return whenConnected(() -> {
             getSimulator().sendMessage(dataGenerator.generateSampleInfoQuery(sampleNumber));
             return "Sent NX600 sample info query for sample " + sampleNumber;
@@ -66,7 +68,7 @@ public class Nx600Commands extends AbstractDeviceCommands {
 
     @Command(name = "nx600 send worklist", description = "Send worklist query")
     public String nx600SendWorklistQuery(
-            @Option(longName = "sampleNumber", defaultValue = "1") String sampleNumber,
+            @Option(longName = "sampleNumber", defaultValue = "3") String sampleNumber,
             @Option(longName = "count", defaultValue = "3") Integer count) {
         return whenConnected(() -> {
             getSimulator().sendMessage(dataGenerator.generateWorklistQuery(sampleNumber, count));
@@ -76,12 +78,13 @@ public class Nx600Commands extends AbstractDeviceCommands {
 
     @Command(name = "nx600 full sequence", description = "Run full NX600 bidirectional sequence (S -> R)")
     public String nx600FullSequence(
-            @Option(longName = "sampleNumber", defaultValue = "1") String sampleNumber) {
+            @Option(longName = "sampleNumber", defaultValue = "3") String sampleNumber,
+            @Option(longName = "patientId", defaultValue = "JENY") String patientId) {
         return whenConnected(() -> {
-            getSimulator().sendMessage(dataGenerator.generateStartMessage(sampleNumber));
+            getSimulator().sendMessage(dataGenerator.generateStartMessage(sampleNumber, patientId));
             CommandUtils.delay(500);
-            getSimulator().sendMessage(dataGenerator.generateResultMessage(sampleNumber));
-            return "Sent full NX600 sequence (S + R) for sample " + sampleNumber;
+            getSimulator().sendMessage(dataGenerator.generateResultMessage(sampleNumber, patientId));
+            return "Sent full NX600 sequence (S + R) for sample " + sampleNumber + " (" + patientId + ")";
         });
     }
 
@@ -100,10 +103,10 @@ public class Nx600Commands extends AbstractDeviceCommands {
             @Option(longName = "port", defaultValue = "9012") Integer port) {
         PrintWriter out = ctx.outputWriter();
         CommandUtils.printAndDelay(out, nx600Connect(host, port));
-        CommandUtils.printAndDelay(out, nx600SendWorklistQuery("1", 3));
-        CommandUtils.printAndDelay(out, nx600SendSampleInfo("1"));
-        CommandUtils.printAndDelay(out, nx600SendStart("1"));
-        CommandUtils.printAndDelay(out, nx600SendResults("1"));
+        CommandUtils.printAndDelay(out, nx600SendWorklistQuery("3", 3));
+        CommandUtils.printAndDelay(out, nx600SendSampleInfo("3"));
+        CommandUtils.printAndDelay(out, nx600SendStart("3", "JENY"));
+        CommandUtils.printAndDelay(out, nx600SendResults("3", "JENY"));
         CommandUtils.printAndDelay(out, nx600SendError());
         return nx600Disconnect();
     }

@@ -1,0 +1,16 @@
+=== SESSION START ===
+Session ID: 20260524-092819-75e2
+Remote: 192.168.1.54
+Started: 2026-05-24 09:28:19
+
+Analyzer: Fujifilm AU20V (Immunoassay) [auto-detected]
+
+--- MESSAGE [T - Measurement results (AU20V)] @ 2026-05-24 09:28:19 ---
+T,NORMAL ,20-05-2026,13:39,10           ,             ,             ,14,9,999,01,01,v-PRG   ,=, 3.34    ng/mL ,01,3.70 ,8.90 ,L          ,0
+--- PARSED ---
+Type: T (Measurement results (AU20V))
+Sample: 10, Patient: , Species: 14
+Tests: v-PRG=3.34 ng/mL [3.70-8.90] L
+--- END MESSAGE ---
+
+=== SESSION END === 2026-05-24 09:28:19

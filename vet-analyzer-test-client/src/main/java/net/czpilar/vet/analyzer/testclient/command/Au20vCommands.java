@@ -39,16 +39,17 @@ public class Au20vCommands extends AbstractDeviceCommands {
 
     @Command(name = "au20v send results", description = "Send immunoassay results")
     public String au20vSendResults(
-            @Option(longName = "sampleNumber", defaultValue = "1") String sampleNumber) {
+            @Option(longName = "sampleNumber", defaultValue = "10") String sampleNumber,
+            @Option(longName = "patientId", defaultValue = "") String patientId) {
         return whenConnected(() -> {
-            getSimulator().sendMessage(dataGenerator.generateResultMessage(sampleNumber));
+            getSimulator().sendMessage(dataGenerator.generateResultMessage(sampleNumber, patientId));
             return "Sent AU20V results for sample " + sampleNumber;
         });
     }
 
     @Command(name = "au20v send order query", description = "Send order query")
     public String au20vSendOrderQuery(
-            @Option(longName = "sampleNumber", defaultValue = "1") String sampleNumber,
+            @Option(longName = "sampleNumber", defaultValue = "10") String sampleNumber,
             @Option(longName = "count", defaultValue = "5") Integer count) {
         return whenConnected(() -> {
             getSimulator().sendMessage(dataGenerator.generateOrderQuery(sampleNumber, count));
@@ -58,7 +59,7 @@ public class Au20vCommands extends AbstractDeviceCommands {
 
     @Command(name = "au20v send order query ref range", description = "Send order query with reference interval range")
     public String au20vSendOrderQueryRefRange(
-            @Option(longName = "sampleNumber", defaultValue = "1") String sampleNumber,
+            @Option(longName = "sampleNumber", defaultValue = "10") String sampleNumber,
             @Option(longName = "count", defaultValue = "5") Integer count) {
         return whenConnected(() -> {
             getSimulator().sendMessage(dataGenerator.generateOrderQueryWithRefRange(sampleNumber, count));
@@ -76,11 +77,12 @@ public class Au20vCommands extends AbstractDeviceCommands {
 
     @Command(name = "au20v full sequence", description = "Run full AU20V sequence (S -> T)")
     public String au20vFullSequence(
-            @Option(longName = "sampleNumber", defaultValue = "1") String sampleNumber) {
+            @Option(longName = "sampleNumber", defaultValue = "10") String sampleNumber,
+            @Option(longName = "patientId", defaultValue = "") String patientId) {
         return whenConnected(() -> {
-            getSimulator().sendMessage(dataGenerator.generateStartMessage(sampleNumber));
+            getSimulator().sendMessage(dataGenerator.generateStartMessage(sampleNumber, patientId));
             CommandUtils.delay(500);
-            getSimulator().sendMessage(dataGenerator.generateResultMessage(sampleNumber));
+            getSimulator().sendMessage(dataGenerator.generateResultMessage(sampleNumber, patientId));
             return "Sent full AU20V sequence (S + T) for sample " + sampleNumber;
         });
     }
@@ -92,11 +94,11 @@ public class Au20vCommands extends AbstractDeviceCommands {
             @Option(longName = "port", defaultValue = "9012") Integer port) {
         PrintWriter out = ctx.outputWriter();
         CommandUtils.printAndDelay(out, au20vConnect(host, port));
-        CommandUtils.printAndDelay(out, au20vSendOrderQuery("1", 5));
-        CommandUtils.printAndDelay(out, au20vSendOrderQueryRefRange("1", 5));
-        CommandUtils.printAndDelay(out, au20vSendResults("1"));
+        CommandUtils.printAndDelay(out, au20vSendOrderQuery("10", 5));
+        CommandUtils.printAndDelay(out, au20vSendOrderQueryRefRange("10", 5));
+        CommandUtils.printAndDelay(out, au20vSendResults("10", ""));
         CommandUtils.printAndDelay(out, au20vSendError());
-        CommandUtils.printAndDelay(out, au20vFullSequence("2"));
+        CommandUtils.printAndDelay(out, au20vFullSequence("11", ""));
         return au20vDisconnect();
     }
 

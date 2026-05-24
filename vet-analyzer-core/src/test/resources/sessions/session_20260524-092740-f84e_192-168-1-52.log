@@ -1,0 +1,16 @@
+=== SESSION START ===
+Session ID: 20260524-092740-f84e
+Remote: 192.168.1.52
+Started: 2026-05-24 09:27:40
+
+Analyzer: Fujifilm NX600 (Biochemistry) [auto-detected]
+
+--- MESSAGE [R - Measurement results] @ 2026-05-24 09:27:40 ---
+R,NORMAL ,22-05-2026,12:34,1            ,ANICKA       ,             ,19,9,999,01,03,BUN-PS  ,=,7.28     mmol/l,01,5.00 ,11.30,           ,CRE-PS  ,=,85       umol/l,01,50   ,170  ,           ,BUN/CRE ,=,85.6     (SI)  ,01,70.5 ,88.3 ,           
+--- PARSED ---
+Type: R (Measurement results)
+Sample: 1, Patient: ANICKA, Species: 19
+Tests: BUN-PS=7.28 mmol/l [5.00-11.30], CRE-PS=85 umol/l [50-170], BUN/CRE=85.6 (SI) [70.5-88.3]
+--- END MESSAGE ---
+
+=== SESSION END === 2026-05-24 09:27:40
