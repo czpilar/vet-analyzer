@@ -107,6 +107,42 @@ OBX|21|NM|GRNR||44.9|%|0.0-99.9|ER|||P"""
         rbc.abnormalFlag() == "ER"
     }
 
+    def "parse OBX unwraps HL7 null marker across all cleaned text fields"() {
+        given:
+        // OBX-22 is real BM850 output with the explicit-null marker (HL7 v2 `""`)
+        // in value (OBX-5) and abnormalFlag (OBX-8). OBX-23 pushes the same marker
+        // through every other OBX text field the parser cleans (valueType,
+        // observationId, unit, referenceRange, observationStatus) to verify HL7's
+        // null-encoding rule is honoured for all ST/ID/IS fields.
+        def message = """\
+MSH|^~\\&|BM850^HL7MW|||||20190902135341|ORU^R01|BM_1|P|2.7
+OBR|1||68|12345
+OBX|22|NM|EOSA||""|10*9/L|0.1-1.5|""|||P
+OBX|23|""|""||""|""|""|""|||""
+"""
+
+        when:
+        def parsed = parser.parse(message)
+        def eosa = parsed.observations().find { it.observationId() == "EOSA" }
+        def allNull = parsed.observations().find { it.setId() == 23 }
+
+        then:
+        eosa.value() == ""
+        eosa.abnormalFlag() == ""
+        eosa.unit() == "10*9/L"
+        eosa.referenceRange() == "0.1-1.5"
+        eosa.observationStatus() == "P"
+
+        and:
+        allNull.valueType() == ""
+        allNull.observationId() == ""
+        allNull.value() == ""
+        allNull.unit() == ""
+        allNull.referenceRange() == ""
+        allNull.abnormalFlag() == ""
+        allNull.observationStatus() == ""
+    }
+
     def "parse HL7 datetime correctly"() {
         when:
         def message = parser.parse(REAL_HL7_DATA)

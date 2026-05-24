@@ -95,7 +95,7 @@ public abstract class AbstractHl7MessageParser implements MessageParser<Hl7Messa
                     if (fields.length > 22) observationDateTime = parseHl7DateTime(fields[22]);
                 }
                 case "NTE" -> {
-                    if (fields.length > 3) comment = cleanValue(fields[3]);
+                    if (fields.length > 3) comment = cleanHl7Field(fields[3]);
                 }
                 case "OBX" -> observations.add(parseObx(fields));
                 default -> log.trace("Ignoring segment: {}", segmentType);
@@ -124,20 +124,33 @@ public abstract class AbstractHl7MessageParser implements MessageParser<Hl7Messa
 
     private static Hl7Observation parseObx(String[] fields) {
         int setId = fields.length > 1 ? parseIntSafe(fields[1]) : 0;
-        String valueType = fields.length > 2 ? fields[2] : "";
-        String observationId = fields.length > 3 ? fields[3] : "";
-        String value = fields.length > 5 ? cleanValue(fields[5]) : "";
-        String unit = fields.length > 6 ? fields[6] : "";
-        String referenceRange = fields.length > 7 ? fields[7] : "";
-        String abnormalFlag = fields.length > 8 ? fields[8] : "";
-        String status = fields.length > 11 ? fields[11] : "";
+        String valueType = fields.length > 2 ? cleanHl7Field(fields[2]) : "";
+        String observationId = fields.length > 3 ? cleanHl7Field(fields[3]) : "";
+        String value = fields.length > 5 ? cleanHl7Field(fields[5]) : "";
+        String unit = fields.length > 6 ? cleanHl7Field(fields[6]) : "";
+        String referenceRange = fields.length > 7 ? cleanHl7Field(fields[7]) : "";
+        String abnormalFlag = fields.length > 8 ? cleanHl7Field(fields[8]) : "";
+        String status = fields.length > 11 ? cleanHl7Field(fields[11]) : "";
 
         return new Hl7Observation(setId, valueType, observationId, value, unit, referenceRange, abnormalFlag, status);
     }
 
-    private static String cleanValue(String value) {
-        if (value == null) return "";
-        if ("\"\"".equals(value)) return "";
+    /**
+     * Unwraps the HL7 v2 explicit-null marker to an empty string. Per HL7 v2.x
+     * chapter 2 (Control), the literal token {@code ""} (two double-quote characters)
+     * encodes a "present but explicitly null" value and is valid for any ST/ID/IS
+     * string field — observation value, unit, reference range, abnormal flag,
+     * observation status, NTE comment, etc. Real analyzers (Boule BM850 / EXIGO H400)
+     * emit it across multiple OBX fields, not just OBX-5. {@code null} input is
+     * normalized to an empty string as well.
+     */
+    private static String cleanHl7Field(String value) {
+        if (value == null) {
+            return "";
+        }
+        if ("\"\"".equals(value)) {
+            return "";
+        }
         return value;
     }
 
