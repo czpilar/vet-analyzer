@@ -6,6 +6,10 @@ const state = {
     selectedId: null,
     sessionsKey: null,
     detailKey: null,
+    seen: {},
+    summaries: [],
+    detailCount: null,
+    initialized: false,
 };
 
 async function fetchJson(url, options = {}) {
@@ -48,6 +52,8 @@ async function callLifecycle(action) {
 async function refreshSessions() {
     try {
         const summaries = await fetchJson("/api/sessions");
+        updateSeen(summaries);
+        state.summaries = summaries;
         const key = summaries.map((s) => `${s.id}|${s.messageCount}|${s.endedAt || ""}`).join("\n");
         if (key !== state.sessionsKey || !state.sessionsKey) {
             state.sessionsKey = key;
@@ -56,6 +62,26 @@ async function refreshSessions() {
     } catch (e) {
         $("sessions-list").innerHTML = `<li style="color:#ef4444;padding:16px;">Failed to load: ${e.message}</li>`;
     }
+}
+
+function updateSeen(summaries) {
+    for (const s of summaries) {
+        if (!state.initialized || s.id === state.selectedId) {
+            state.seen[s.id] = s.messageCount;
+        }
+    }
+    state.initialized = true;
+}
+
+function hasUnseen(s) {
+    if (s.id === state.selectedId) {
+        return false;
+    }
+    const seen = state.seen[s.id];
+    if (seen === undefined) {
+        return true;
+    }
+    return s.messageCount > seen;
 }
 
 function renderSessionsList(summaries) {
@@ -70,6 +96,8 @@ function renderSessionsList(summaries) {
         li.dataset.id = s.id;
         if (s.id === state.selectedId) {
             li.classList.add("selected");
+        } else if (hasUnseen(s)) {
+            li.classList.add("unseen");
         }
         const active = !s.endedAt;
         li.innerHTML = `
@@ -90,8 +118,17 @@ function renderSessionsList(summaries) {
 async function selectSession(id) {
     state.selectedId = id;
     state.detailKey = null;
+    state.detailCount = null;
+    const s = state.summaries.find((x) => x.id === id);
+    if (s) {
+        state.seen[id] = s.messageCount;
+    }
     document.querySelectorAll("#sessions-list li").forEach((li) => {
-        li.classList.toggle("selected", li.dataset.id === id);
+        const match = li.dataset.id === id;
+        li.classList.toggle("selected", match);
+        if (match) {
+            li.classList.remove("unseen");
+        }
     });
     await refreshDetail();
 }
@@ -129,9 +166,14 @@ function renderDetail(detail) {
 
     const msgsHost = $("detail-messages");
     msgsHost.innerHTML = "";
-    for (const m of [...detail.messages].reverse()) {
+    const ordered = [...detail.messages].reverse();
+    const added = state.detailCount == null ? 0 : Math.max(0, ordered.length - state.detailCount);
+    ordered.forEach((m, i) => {
         const card = document.createElement("div");
         card.className = "message";
+        if (i < added) {
+            card.classList.add("flash-new");
+        }
         card.innerHTML = `
             <div class="message-header">
                 <span class="message-type">${escapeHtml(m.type || "(unknown)")}</span>
@@ -148,7 +190,8 @@ function renderDetail(detail) {
             </div>` : ""}
         `;
         msgsHost.appendChild(card);
-    }
+    });
+    state.detailCount = ordered.length;
 }
 
 const PARSED_SKIP = new Set(["analyzerType", "rawData", "receivedAt"]);
