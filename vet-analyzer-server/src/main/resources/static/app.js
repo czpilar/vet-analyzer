@@ -196,6 +196,13 @@ function renderDetail(detail) {
 
 const PARSED_SKIP = new Set(["analyzerType", "rawData", "receivedAt"]);
 
+function labelKey(key) {
+    return String(key)
+        .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+        .replace(/([A-Z]+)([A-Z][a-z])/g, "$1 $2")
+        .toLowerCase();
+}
+
 function renderParsed(parsed) {
     const scalars = [];
     const tables = [];
@@ -215,7 +222,7 @@ function renderParsed(parsed) {
     if (scalars.length > 0) {
         html += `<div class="parsed-grid">`;
         for (const { key, value } of scalars) {
-            html += `<div class="key">${escapeHtml(key)}</div><div class="val">${formatScalar(value)}</div>`;
+            html += `<div class="key">${escapeHtml(labelKey(key))}</div><div class="val">${formatScalar(value)}</div>`;
         }
         html += `</div>`;
     }
@@ -227,10 +234,10 @@ function renderParsed(parsed) {
 
 function renderTable(name, rows) {
     const columns = [...new Set(rows.flatMap((r) => Object.keys(r)))];
-    let html = `<div class="parsed-table-name">${escapeHtml(name)}</div>`;
+    let html = `<div class="parsed-table-name">${escapeHtml(labelKey(name))}</div>`;
     html += `<table class="parsed-table"><thead><tr>`;
     for (const col of columns) {
-        html += `<th>${escapeHtml(col)}</th>`;
+        html += `<th>${escapeHtml(labelKey(col))}</th>`;
     }
     html += `</tr></thead><tbody>`;
     for (const row of rows) {
