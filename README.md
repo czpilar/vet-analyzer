@@ -112,7 +112,7 @@ vet:
 
 The standalone server serves a simple web UI at `http://localhost:8090/` (vanilla HTML/JS, no build step) for:
 - monitoring TCP server status and controlling its lifecycle (start / stop / restart)
-- browsing sessions (newest first, auto-polled every 3 s)
+- browsing sessions (newest first, auto-polled every 3 s, with new-message highlight on unviewed sessions)
 - inspecting per-session messages with raw payload and parsed structured data
 
 ### REST API
