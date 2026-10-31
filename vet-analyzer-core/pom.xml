@@ -14,16 +14,6 @@
     <description>Core library for veterinary analyzer protocol parsing</description>
 
     <dependencies>
-        <!-- HAPI HL7 -->
-        <dependency>
-            <groupId>ca.uhn.hapi</groupId>
-            <artifactId>hapi-base</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>ca.uhn.hapi</groupId>
-            <artifactId>hapi-structures-v27</artifactId>
-        </dependency>
-
         <!-- Commons -->
         <dependency>
             <groupId>org.apache.commons</groupId>
