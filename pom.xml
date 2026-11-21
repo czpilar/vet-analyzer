@@ -47,12 +47,12 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- dependency versions -->
-        <version.spring-boot>4.1.2</version.spring-boot>
-        <version.spring-shell>4.0.3</version.spring-shell>
-        <version.commons-lang3>3.21.0</version.commons-lang3>
-        <version.netty>4.2.19.Final</version.netty>
+        <version.spring-boot>4.2.0</version.spring-boot>
+        <version.spring-shell>4.0.4</version.spring-shell>
+        <version.commons-lang3>3.22.0</version.commons-lang3>
+        <version.netty>4.2.21.Final</version.netty>
         <version.slf4j>2.0.20</version.slf4j>
-        <version.logback>1.6.6</version.logback>
+        <version.logback>1.6.8</version.logback>
         <version.junit>6.1.3</version.junit>
         <version.mockito>5.24.0</version.mockito>
         <version.spock>2.5-groovy-6.0</version.spock>
